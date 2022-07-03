@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">NoActive</string>
+    <string name="app_description">Let app no active in background</string>
+</resources>
