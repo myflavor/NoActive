@@ -98,6 +98,16 @@ public class AppSwitchHook extends XC_MethodHook {
                 }
                 // 获取进程名
                 String processName = processRecord.getProcessName();
+                // 如果进程名称不是包名开头就跳过
+                if (!processName.startsWith(packageName)) {
+                    continue;
+                }
+                // 如果系统黑名单不包含包名并且是系统应用并且进程名是包名开头(APP调用的WebView是系统APP)
+                if (!memData.getBlackSystemApps().contains(packageName) && applicationInfo.isSystem()) {
+                    Log.d(packageName + " is white system app");
+                    // 直接返回空列表
+                    return new ArrayList<>();
+                }
                 // 如果白名单进程包含进程则跳过
                 if (memData.getWhiteProcessList().contains(processName)) {
                     Log.d("white process " + processName);
@@ -107,13 +117,6 @@ public class AppSwitchHook extends XC_MethodHook {
                 if (memData.getWhiteApps().contains(packageName) && !memData.getKillProcessList().contains(processName)) {
                     Log.d("white app process " + processName);
                     continue;
-                }
-                // 如果系统黑名单不包含包名并且是系统应用并且进程名是包名开头(APP调用的WebView是系统APP)
-                if (!memData.getBlackSystemApps().contains(packageName) && applicationInfo.isSystem()
-                        && processName.startsWith(packageName)) {
-                    Log.d(packageName + " is white system app");
-                    // 直接返回空列表
-                    return new ArrayList<>();
                 }
                 // 添加目标进程
                 targetProcessRecords.add(processRecord);
@@ -131,13 +134,9 @@ public class AppSwitchHook extends XC_MethodHook {
     public void onResume(String packageName, List<ProcessRecord> targetProcessRecords) {
         Log.d(packageName + " resumed");
         // 后台APP移除包名
-        memData.getBlackSystemApps().remove(packageName);
+        memData.getAppBackgroundSet().remove(packageName);
         // 遍历目标进程列表
         for (ProcessRecord targetProcessRecord : targetProcessRecords) {
-            // 如果白名单包含目标进程就跳过
-            if (memData.getWhiteProcessList().contains(targetProcessRecord.getProcessName())) {
-                continue;
-            }
             // 解冻进程
             Process.unFreezer(classLoader, targetProcessRecord.getPid());
         }
@@ -172,10 +171,6 @@ public class AppSwitchHook extends XC_MethodHook {
         memData.getAppBackgroundSet().add(packageName);
         // 遍历目标进程
         for (ProcessRecord targetProcessRecord : targetProcessRecords) {
-            // 如果目标进程是系统应用就跳过(WebView)
-            if (targetProcessRecord.getApplicationInfo().isSystem()) {
-                continue;
-            }
             // 目标进程名
             String processName = targetProcessRecord.getProcessName();
             // 目标进程PID
