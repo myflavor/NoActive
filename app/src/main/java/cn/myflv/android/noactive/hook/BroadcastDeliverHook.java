@@ -37,6 +37,11 @@ public class BroadcastDeliverHook extends XC_MethodHook {
         if (packageName == null) {
             return;
         }
+        String processName = processRecord.getProcessName();
+        // 如果进程名称不是包名开头就跳过
+        if (!processName.startsWith(packageName)) {
+            return;
+        }
         // 如果是系统应用并且不是系统黑名单就不处理
         if (applicationInfo.isSystem() && !memData.getBlackSystemApps().contains(packageName)) {
             return;
@@ -45,7 +50,6 @@ public class BroadcastDeliverHook extends XC_MethodHook {
         if (!memData.getAppBackgroundSet().contains(packageName)) {
             return;
         }
-        String processName = processRecord.getProcessName();
         // 如果白名单应用或者进程就不处理
         if (memData.getWhiteApps().contains(packageName) || memData.getWhiteProcessList().contains(processName)) {
             return;
