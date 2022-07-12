@@ -16,4 +16,8 @@ public class ClassEnum {
     public final static String AnrRecord = AnrHelper + "$AnrRecord";
     public final static String AppErrors = "com.android.server.am.AppErrors";
     public final static String ActivityRecord = "com.android.server.am.ActivityRecord";
+    public final static String Instrumentation = "android.app.Instrumentation";
+
+    public final static String Activity = "android.app.Activity";
+
 }

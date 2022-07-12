@@ -8,7 +8,7 @@ import de.robv.android.xposed.XposedHelpers;
 public class Process {
     public final static String Process = "android.os.Process";
 
-    public final static int Freezer = 19;
+    public final static int Freezer = 20;
     public final static int UnFreezer = 18;
     public final static int Kill = 9;
 

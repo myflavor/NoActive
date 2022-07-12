@@ -9,8 +9,8 @@ android {
         applicationId "cn.myflv.android.noactive"
         minSdk 23
         targetSdk 32
-        versionCode 88
-        versionName "0.8.8-R(19)"
+        versionCode 96
+        versionName "0.9-R(20)"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

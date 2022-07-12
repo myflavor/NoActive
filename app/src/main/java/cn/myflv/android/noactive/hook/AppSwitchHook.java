@@ -103,7 +103,7 @@ public class AppSwitchHook extends XC_MethodHook {
                     continue;
                 }
                 // 如果系统黑名单不包含包名并且是系统应用并且进程名是包名开头(APP调用的WebView是系统APP)
-                if (!memData.getBlackSystemApps().contains(packageName) && applicationInfo.isSystem()) {
+                if (applicationInfo.getUid() < 10000 || (!memData.getBlackSystemApps().contains(packageName) && applicationInfo.isSystem())) {
                     Log.d(packageName + " is white system app");
                     // 直接返回空列表
                     return new ArrayList<>();

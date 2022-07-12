@@ -22,4 +22,6 @@ public class MethodEnum {
     public final static String add = "add";
     public final static String stopAllForegroundServicesLocked = "stopAllForegroundServicesLocked";
     public final static String killServicesLocked = "killServicesLocked";
+    public final static String callActivityOnPause = "callActivityOnPause";
+    public final static String callActivityOnResume = "callActivityOnResume";
 }

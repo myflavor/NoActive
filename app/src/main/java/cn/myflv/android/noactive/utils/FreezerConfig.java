@@ -55,6 +55,7 @@ public class FreezerConfig {
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 if ("".equals(line.trim())) continue;
+                if (line.startsWith("#")) continue;
                 set.add(line.trim());
                 Log.i(name.replace(".conf", "") + " add " + line);
             }

@@ -43,7 +43,7 @@ public class BroadcastDeliverHook extends XC_MethodHook {
             return;
         }
         // 如果是系统应用并且不是系统黑名单就不处理
-        if (applicationInfo.isSystem() && !memData.getBlackSystemApps().contains(packageName)) {
+        if (applicationInfo.getUid() < 10000 || (applicationInfo.isSystem() && !memData.getBlackSystemApps().contains(packageName))) {
             return;
         }
         // 如果是前台应用就不处理
