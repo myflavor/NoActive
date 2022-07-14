@@ -1,5 +1,6 @@
 package cn.myflv.android.noactive.server;
 
+import android.annotation.TargetApi;
 import android.os.Build;
 
 import cn.myflv.android.noactive.entity.FieldEnum;
