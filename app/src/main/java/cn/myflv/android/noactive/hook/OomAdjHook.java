@@ -8,19 +8,31 @@ import cn.myflv.android.noactive.utils.Log;
 import de.robv.android.xposed.XC_MethodHook;
 
 public class OomAdjHook extends XC_MethodHook {
-
     private final MemData memData;
+    private final int type;
+    public final static int Android_S = 1;
+    public final static int Android_Q_R = 2;
 
-    public OomAdjHook(MemData memData) {
+    public OomAdjHook(MemData memData, int type) {
         this.memData = memData;
+        this.type = type;
     }
 
 
     @Override
     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
         super.beforeHookedMethod(param);
-        ProcessStateRecord processStateRecord = new ProcessStateRecord(param.thisObject);
-        ProcessRecord processRecord = processStateRecord.getProcessRecord();
+        ProcessRecord processRecord;
+        switch (type) {
+            case Android_S:
+                processRecord = new ProcessStateRecord(param.thisObject).getProcessRecord();
+                break;
+            case Android_Q_R:
+                processRecord = new ProcessRecord(param.args[0]);
+                break;
+            default:
+                return;
+        }
         // 如果进程或者应用信息为空就不处理
         if (processRecord == null || processRecord.getApplicationInfo() == null) {
             return;
@@ -33,7 +45,7 @@ public class OomAdjHook extends XC_MethodHook {
         }
         String processName = processRecord.getProcessName();
         // 如果进程名称等于包名就跳过
-        if (processName.equals(packageName)) {
+        if (!processName.startsWith(packageName)) {
             return;
         }
         // 如果是系统应用并且不是系统黑名单就不处理
@@ -48,7 +60,28 @@ public class OomAdjHook extends XC_MethodHook {
         if (memData.getWhiteApps().contains(packageName) || memData.getWhiteProcessList().contains(processName)) {
             return;
         }
-        Log.d(processRecord.getProcessName() + " cache");
-        param.args[0] = 999;
+
+        int curAdj;
+        switch (type) {
+            case Android_S:
+                curAdj = (int) param.args[0];
+                break;
+            case Android_Q_R:
+                curAdj = processRecord.getCurAdj();
+                break;
+            default:
+                return;
+        }
+        int finalCurlAdj = processName.equals(packageName) ? Math.max(curAdj, 700) : 999;
+
+        switch (type) {
+            case Android_S:
+                param.args[0] = finalCurlAdj;
+                break;
+            case Android_Q_R:
+                processRecord.setCurAdj(finalCurlAdj);
+                break;
+            default:
+        }
     }
 }

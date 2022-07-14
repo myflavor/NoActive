@@ -26,4 +26,5 @@ public class MethodEnum {
     public final static String callActivityOnResume = "callActivityOnResume";
     public final static String setCurAdj = "setCurAdj";
 
+    public final static String applyOomAdjLocked = "applyOomAdjLocked";
 }

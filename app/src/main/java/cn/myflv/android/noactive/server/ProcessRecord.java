@@ -33,4 +33,13 @@ public class ProcessRecord {
     public boolean isNull() {
         return processRecord == null;
     }
+
+    public int getCurAdj() {
+        return XposedHelpers.getIntField(processRecord, FieldEnum.curAdj);
+    }
+
+    public void setCurAdj(int curAdj) {
+        XposedHelpers.setIntField(processRecord, FieldEnum.curAdj, curAdj);
+    }
+
 }

@@ -36,7 +36,10 @@ public class Hook implements IXposedHookLoadPackage {
 
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.S) {
             Log.i("Auto lmk");
-            XposedHelpers.findAndHookMethod(ClassEnum.ProcessStateRecord, classLoader, MethodEnum.setCurAdj, int.class, new OomAdjHook(memData));
+            XposedHelpers.findAndHookMethod(ClassEnum.ProcessStateRecord, classLoader, MethodEnum.setCurAdj, int.class, new OomAdjHook(memData,OomAdjHook.Android_S));
+        } else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R || Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
+            Log.i("Auto lmk test");
+            XposedHelpers.findAndHookMethod(ClassEnum.OomAdjuster, classLoader, MethodEnum.applyOomAdjLocked, ClassEnum.ProcessRecord, boolean.class, long.class, long.class, new OomAdjHook(memData,OomAdjHook.Android_Q_R));
         }
 
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.Q) {

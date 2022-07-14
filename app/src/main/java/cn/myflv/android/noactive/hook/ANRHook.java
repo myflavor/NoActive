@@ -3,6 +3,7 @@ package cn.myflv.android.noactive.hook;
 import cn.myflv.android.noactive.entity.MemData;
 import cn.myflv.android.noactive.server.AnrHelper;
 import cn.myflv.android.noactive.server.ProcessRecord;
+import cn.myflv.android.noactive.utils.Log;
 import de.robv.android.xposed.XC_MethodReplacement;
 
 public class ANRHook extends XC_MethodReplacement {
@@ -36,6 +37,7 @@ public class ANRHook extends XC_MethodReplacement {
             // 开启ANR消费如果需要
             anrHelper.startAnrConsumerIfNeeded();
         }
+        Log.d("Keep " + (processRecord.getProcessName() != null ? processRecord.getProcessName() : packageName));
         // 不处理
         return null;
     }

@@ -24,4 +24,5 @@ public class FieldEnum {
     public final static String userId = "userId";
     public final static String mProcLock = "mProcLock";
     public final static String mApp = "mApp";
+    public final static String curAdj = "curAdj";
 }
