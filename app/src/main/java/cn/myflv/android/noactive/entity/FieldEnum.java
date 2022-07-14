@@ -22,5 +22,6 @@ public class FieldEnum {
     public final static String mErrorState = "mErrorState";
     public final static String mState = "mState";
     public final static String userId = "userId";
-    public final static String mProcLock="mProcLock";
+    public final static String mProcLock = "mProcLock";
+    public final static String mApp = "mApp";
 }

@@ -24,4 +24,6 @@ public class MethodEnum {
     public final static String killServicesLocked = "killServicesLocked";
     public final static String callActivityOnPause = "callActivityOnPause";
     public final static String callActivityOnResume = "callActivityOnResume";
+    public final static String setCurAdj = "setCurAdj";
+
 }

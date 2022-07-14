@@ -20,4 +20,5 @@ public class ClassEnum {
 
     public final static String Activity = "android.app.Activity";
 
+    public final static String ProcessStateRecord="com.android.server.am.ProcessStateRecord";
 }

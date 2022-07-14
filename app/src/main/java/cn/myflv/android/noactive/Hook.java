@@ -6,6 +6,7 @@ import cn.myflv.android.noactive.entity.ClassEnum;
 import cn.myflv.android.noactive.entity.MemData;
 import cn.myflv.android.noactive.entity.MethodEnum;
 import cn.myflv.android.noactive.hook.ANRHook;
+import cn.myflv.android.noactive.hook.OomAdjHook;
 import cn.myflv.android.noactive.hook.AppSwitchHook;
 import cn.myflv.android.noactive.hook.BroadcastDeliverHook;
 import cn.myflv.android.noactive.utils.Log;
@@ -32,6 +33,12 @@ public class Hook implements IXposedHookLoadPackage {
                 ClassEnum.BroadcastRecord,
                 ClassEnum.BroadcastFilter, boolean.class, int.class, new BroadcastDeliverHook(memData));
 
+
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.S) {
+            Log.i("Auto lmk");
+            XposedHelpers.findAndHookMethod(ClassEnum.ProcessStateRecord, classLoader, MethodEnum.setCurAdj, int.class, new OomAdjHook(memData));
+        }
+
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.Q) {
             Log.i("Auto keep process");
             XposedHelpers.findAndHookMethod(ClassEnum.AnrHelper, classLoader, MethodEnum.appNotResponding,
@@ -57,6 +64,7 @@ public class Hook implements IXposedHookLoadPackage {
 
             );
         }
+
     }
 
 }
