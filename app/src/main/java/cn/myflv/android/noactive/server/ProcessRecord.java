@@ -19,7 +19,7 @@ public class ProcessRecord {
 
     public ProcessRecord(Object processRecord) {
         this.processRecord = processRecord;
-        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.S) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             this.pid = XposedHelpers.getIntField(processRecord, FieldEnum.mPid);
         } else {
             this.pid = XposedHelpers.getIntField(processRecord, FieldEnum.pid);

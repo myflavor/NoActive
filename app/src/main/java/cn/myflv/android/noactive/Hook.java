@@ -34,7 +34,7 @@ public class Hook implements IXposedHookLoadPackage {
                 ClassEnum.BroadcastFilter, boolean.class, int.class, new BroadcastDeliverHook(memData));
 
 
-        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.S) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             Log.i("Auto lmk");
             XposedHelpers.findAndHookMethod(ClassEnum.ProcessStateRecord, classLoader, MethodEnum.setCurAdj, int.class, new OomAdjHook(memData,OomAdjHook.Android_S));
         } else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R || Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
