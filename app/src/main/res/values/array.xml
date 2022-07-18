@@ -2,5 +2,6 @@
 <resources>
     <string-array name="xposed_scope">
         <item>android</item>
+        <item>com.miui.powerkeeper</item>
     </string-array>
 </resources>

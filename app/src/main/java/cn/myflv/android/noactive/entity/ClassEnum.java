@@ -22,4 +22,7 @@ public class ClassEnum {
 
     public final static String ProcessStateRecord = "com.android.server.am.ProcessStateRecord";
     public final static String OomAdjuster = "com.android.server.am.OomAdjuster";
+    public final static String SystemProperties = "android.os.SystemProperties";
+
+    public final static String MilletConfig = "com.miui.powerkeeper.millet.MilletConfig";
 }

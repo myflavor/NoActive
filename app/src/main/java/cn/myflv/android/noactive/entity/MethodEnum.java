@@ -27,4 +27,6 @@ public class MethodEnum {
     public final static String setCurAdj = "setCurAdj";
 
     public final static String applyOomAdjLocked = "applyOomAdjLocked";
+    public final static String get = "get";
+    public final static String getEnable="getEnable";
 }
