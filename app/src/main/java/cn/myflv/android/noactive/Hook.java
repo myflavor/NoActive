@@ -13,28 +13,30 @@ import cn.myflv.android.noactive.hook.BroadcastDeliverHook;
 import cn.myflv.android.noactive.utils.Log;
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodReplacement;
+import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class Hook implements IXposedHookLoadPackage {
-    private final MemData memData = new MemData();
 
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam packageParam) throws Throwable {
         // 禁用 millet
-        if (packageParam.packageName.equals("com.miui.powerkeeper")){
-            try{
+        if (packageParam.packageName.equals("com.miui.powerkeeper")) {
+            try {
                 XposedHelpers.findAndHookMethod(ClassEnum.MilletConfig, packageParam.classLoader, MethodEnum.getEnable, Context.class, new XC_MethodReplacement() {
                     @Override
                     protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
                         return false;
                     }
                 });
-                Log.i("Disable millet");
-            }catch (Exception ignored){}
-
+                XposedBridge.log("NoActive -> Disable millet");
+            } catch (Exception ignored) {
+            }
+            return;
         }
         if (!packageParam.packageName.equals("android")) return;
+        MemData memData = new MemData();
         ClassLoader classLoader = packageParam.classLoader;
 
         // Hook 切换事件
@@ -50,10 +52,10 @@ public class Hook implements IXposedHookLoadPackage {
 
         // Hook oom_adj
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            XposedHelpers.findAndHookMethod(ClassEnum.ProcessStateRecord, classLoader, MethodEnum.setCurAdj, int.class, new OomAdjHook(memData,OomAdjHook.Android_S));
+            XposedHelpers.findAndHookMethod(ClassEnum.ProcessStateRecord, classLoader, MethodEnum.setCurAdj, int.class, new OomAdjHook(memData, OomAdjHook.Android_S));
             Log.i("Auto lmk");
         } else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R || Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
-            XposedHelpers.findAndHookMethod(ClassEnum.OomAdjuster, classLoader, MethodEnum.applyOomAdjLocked, ClassEnum.ProcessRecord, boolean.class, long.class, long.class, new OomAdjHook(memData,OomAdjHook.Android_Q_R));
+            XposedHelpers.findAndHookMethod(ClassEnum.OomAdjuster, classLoader, MethodEnum.applyOomAdjLocked, ClassEnum.ProcessRecord, boolean.class, long.class, long.class, new OomAdjHook(memData, OomAdjHook.Android_Q_R));
             Log.i("Auto lmk");
         }
 
