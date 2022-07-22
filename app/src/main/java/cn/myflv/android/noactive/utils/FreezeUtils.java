@@ -21,6 +21,10 @@ import de.robv.android.xposed.XposedHelpers;
 public class FreezeUtils {
 
 
+    private static final int FREEZE_ACTION = 1;
+    private static final int UNFREEZE_ACTION = 0;
+
+
     private static final String V1_FREEZER_FROZEN_PORCS = "/sys/fs/cgroup/freezer/perf/frozen/cgroup.procs";
     private static final String V1_FREEZER_THAWED_PORCS = "/sys/fs/cgroup/freezer/perf/thawed/cgroup.procs";
 
@@ -46,13 +50,12 @@ public class FreezeUtils {
         if (FreezerConfig.isKill20()) {
             return 20;
         }
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
-            return 19;
-        }
-        Class<?> CachedAppOptimizer = XposedHelpers.findClass(ClassEnum.CachedAppOptimizer, classLoader);
-        boolean isSupportV2 = (boolean) XposedHelpers.callStaticMethod(CachedAppOptimizer, MethodEnum.isFreezerSupported);
-        if (isSupportV2) {
-            return 2;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            Class<?> CachedAppOptimizer = XposedHelpers.findClass(ClassEnum.CachedAppOptimizer, classLoader);
+            boolean isSupportV2 = (boolean) XposedHelpers.callStaticMethod(CachedAppOptimizer, MethodEnum.isFreezerSupported);
+            if (isSupportV2) {
+                return 2;
+            }
         }
         return 1;
     }
@@ -80,7 +83,7 @@ public class FreezeUtils {
 
     public void freezer(ProcessRecord processRecord) {
         if (freezerVersion == 2) {
-            Process.freezer(classLoader, processRecord.getPid(), processRecord.getUid());
+            freezePid(processRecord.getPid(), processRecord.getUid());
         } else if (freezerVersion == 1) {
             freezePid(processRecord.getPid());
         } else {
@@ -91,7 +94,7 @@ public class FreezeUtils {
 
     public void unFreezer(ProcessRecord processRecord) {
         if (freezerVersion == 2) {
-            Process.unFreezer(classLoader, processRecord.getPid(), processRecord.getUid());
+            thawPid(processRecord.getPid(), processRecord.getUid());
         } else if (freezerVersion == 1) {
             thawPid(processRecord.getPid());
         } else {
@@ -121,5 +124,29 @@ public class FreezeUtils {
             writer.close();
         } catch (IOException ignored) {
         }
+    }
+
+
+    private static void setFreezeAction(int pid, int uid, boolean action) {
+        String path = "/sys/fs/cgroup/uid_" + uid + "/pid_" + pid + "/cgroup.freeze";
+        try {
+            PrintWriter writer = new PrintWriter(path);
+            if (action) {
+                writer.write(Integer.toString(FREEZE_ACTION));
+            } else {
+                writer.write(Integer.toString(UNFREEZE_ACTION));
+            }
+            writer.close();
+        } catch (IOException ignored) {
+        }
+    }
+
+    public static void thawPid(int pid, int uid) {
+        setFreezeAction(pid, uid, false);
+    }
+
+
+    public static void freezePid(int pid, int uid) {
+        setFreezeAction(pid, uid, true);
     }
 }
