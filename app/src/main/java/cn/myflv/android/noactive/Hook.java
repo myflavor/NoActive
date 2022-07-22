@@ -44,14 +44,14 @@ public class Hook implements IXposedHookLoadPackage {
 //        XposedHelpers.findAndHookMethod(ClassEnum.ProcessRecord, classLoader, MethodEnum.setKilled, boolean.class, new ProcessKilledHook());
 //        XposedHelpers.findAndHookMethod(ClassEnum.ProcessRecord, classLoader, MethodEnum.setKilledByAm, boolean.class, new ProcessKilledHook());
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.Q) {
             XposedHelpers.findAndHookMethod(ClassEnum.CachedAppOptimizer, classLoader, MethodEnum.useFreezer, new XC_MethodReplacement() {
                 @Override
                 protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
-                    Log.i("Disable cache freezer");
                     return false;
                 }
             });
+            Log.i("Disable cache freezer");
         }
 
         // Hook 切换事件
