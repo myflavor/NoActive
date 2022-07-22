@@ -28,5 +28,10 @@ public class MethodEnum {
 
     public final static String applyOomAdjLocked = "applyOomAdjLocked";
     public final static String get = "get";
-    public final static String getEnable="getEnable";
+    public final static String getEnable = "getEnable";
+    public final static String setKilled = "setKilled";
+    public final static String setKilledByAm = "setKilledByAm";
+    public final static String isFreezerSupported = "isFreezerSupported";
+    public final static String setProcessFrozen = "setProcessFrozen";
+    public final static String enableFreezer = "enableFreezer";
 }

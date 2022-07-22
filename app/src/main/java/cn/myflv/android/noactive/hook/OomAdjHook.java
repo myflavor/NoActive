@@ -56,23 +56,26 @@ public class OomAdjHook extends XC_MethodHook {
         if (!memData.getAppBackgroundSet().contains(packageName)) {
             return;
         }
+        int finalCurlAdj;
+
         // 如果白名单应用或者进程就不处理
         if (memData.getWhiteApps().contains(packageName) || memData.getWhiteProcessList().contains(processName)) {
-            return;
+            finalCurlAdj = processName.equals(packageName) ? 400 : 500;
+        } else {
+            int curAdj;
+            switch (type) {
+                case Android_S:
+                    curAdj = (int) param.args[0];
+                    break;
+                case Android_Q_R:
+                    curAdj = processRecord.getCurAdj();
+                    break;
+                default:
+                    return;
+            }
+            finalCurlAdj = processName.equals(packageName) ? Math.max(Math.min(curAdj, 500), 700) : 999;
         }
 
-        int curAdj;
-        switch (type) {
-            case Android_S:
-                curAdj = (int) param.args[0];
-                break;
-            case Android_Q_R:
-                curAdj = processRecord.getCurAdj();
-                break;
-            default:
-                return;
-        }
-        int finalCurlAdj = processName.equals(packageName) ? Math.max(curAdj, 700) : 999;
 
         switch (type) {
             case Android_S:

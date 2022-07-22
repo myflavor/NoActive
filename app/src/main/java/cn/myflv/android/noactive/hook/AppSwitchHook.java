@@ -11,6 +11,7 @@ import cn.myflv.android.noactive.server.Event;
 import cn.myflv.android.noactive.server.Process;
 import cn.myflv.android.noactive.server.ProcessList;
 import cn.myflv.android.noactive.server.ProcessRecord;
+import cn.myflv.android.noactive.utils.FreezeUtils;
 import cn.myflv.android.noactive.utils.Log;
 import cn.myflv.android.noactive.utils.ThreadUtil;
 import de.robv.android.xposed.XC_MethodHook;
@@ -25,6 +26,7 @@ public class AppSwitchHook extends XC_MethodHook {
 
     private final ClassLoader classLoader;
     private final MemData memData;
+    private final FreezeUtils freezeUtils;
 
 
     public AppSwitchHook(ClassLoader classLoader, MemData memData, int type) {
@@ -32,6 +34,7 @@ public class AppSwitchHook extends XC_MethodHook {
         this.ACTIVITY_RESUMED = Event.ACTIVITY_RESUMED(classLoader);
         this.ACTIVITY_PAUSED = Event.ACTIVITY_PAUSED(classLoader);
         this.memData = memData;
+        this.freezeUtils = new FreezeUtils(classLoader);
         this.type = type;
     }
 
@@ -138,7 +141,8 @@ public class AppSwitchHook extends XC_MethodHook {
         // 遍历目标进程列表
         for (ProcessRecord targetProcessRecord : targetProcessRecords) {
             // 解冻进程
-            Process.unFreezer(classLoader, targetProcessRecord.getPid());
+//            Process.unFreezer(classLoader, targetProcessRecord.getPid());
+            freezeUtils.unFreezer(targetProcessRecord);
         }
     }
 
@@ -183,7 +187,8 @@ public class AppSwitchHook extends XC_MethodHook {
             } else {
                 Log.d(processName + " freezer");
                 // 冻结进程
-                Process.freezer(classLoader, pid);
+//                Process.freezer(classLoader, pid);
+                freezeUtils.freezer(targetProcessRecord);
             }
         }
     }

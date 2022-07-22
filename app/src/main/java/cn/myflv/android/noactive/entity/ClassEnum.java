@@ -25,4 +25,5 @@ public class ClassEnum {
     public final static String SystemProperties = "android.os.SystemProperties";
 
     public final static String MilletConfig = "com.miui.powerkeeper.millet.MilletConfig";
+    public final static String CachedAppOptimizer = "com.android.server.am.CachedAppOptimizer";
 }

@@ -14,6 +14,26 @@ public class FreezerConfig {
     public final static String blackSystemAppConfig = "blackSystemApp.conf";
     public final static String whiteProcessConfig = "whiteProcess.conf";
     public final static String killProcessConfig = "killProcess.conf";
+    public final static String disableOOM = "disable.oom";
+    public final static String kill19 = "kill.19";
+    public final static String kill20 = "kill.20";
+
+    public static boolean isKill19() {
+        File config = new File(ConfigDir,kill19);
+        return config.exists();
+    }
+
+    public static boolean isKill20() {
+        File config = new File(ConfigDir,kill20);
+        return config.exists();
+    }
+
+
+    public static boolean isDisableOOM() {
+        File config = new File(ConfigDir,disableOOM);
+        return config.exists();
+    }
+
 
     public static void checkAndInit() {
         File configDir = new File(ConfigDir);
