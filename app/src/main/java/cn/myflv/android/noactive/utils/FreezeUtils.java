@@ -3,6 +3,8 @@
 //
 package cn.myflv.android.noactive.utils;
 
+import android.os.Build;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -43,6 +45,9 @@ public class FreezeUtils {
         }
         if (FreezerConfig.isKill20()) {
             return 20;
+        }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            return 19;
         }
         Class<?> CachedAppOptimizer = XposedHelpers.findClass(ClassEnum.CachedAppOptimizer, classLoader);
         boolean isSupportV2 = (boolean) XposedHelpers.callStaticMethod(CachedAppOptimizer, MethodEnum.isFreezerSupported);
