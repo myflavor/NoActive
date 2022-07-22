@@ -41,10 +41,4 @@ public class Process {
         Class<?> Process = getProcess(classLoader);
         XposedHelpers.callStaticMethod(Process, MethodEnum.setProcessFrozen, pid, uid, false);
     }
-
-    public static void enableFreezer(ClassLoader classLoader, boolean enable) {
-        Class<?> Process = getProcess(classLoader);
-        XposedHelpers.callStaticMethod(Process, MethodEnum.enableFreezer, enable);
-    }
-
 }

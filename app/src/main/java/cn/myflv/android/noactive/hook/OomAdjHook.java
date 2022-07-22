@@ -4,7 +4,6 @@ import cn.myflv.android.noactive.entity.MemData;
 import cn.myflv.android.noactive.server.ApplicationInfo;
 import cn.myflv.android.noactive.server.ProcessRecord;
 import cn.myflv.android.noactive.server.ProcessStateRecord;
-import cn.myflv.android.noactive.utils.Log;
 import de.robv.android.xposed.XC_MethodHook;
 
 public class OomAdjHook extends XC_MethodHook {
@@ -73,7 +72,7 @@ public class OomAdjHook extends XC_MethodHook {
                 default:
                     return;
             }
-            finalCurlAdj = processName.equals(packageName) ? Math.max(Math.min(curAdj, 500), 700) : 999;
+            finalCurlAdj = processName.equals(packageName) ? Math.min(curAdj, 500) : 999;
         }
 
 

@@ -29,9 +29,6 @@ public class FreezeUtils {
     public FreezeUtils(ClassLoader classLoader) {
         this.classLoader = classLoader;
         this.freezerVersion = getFreezerVersion(classLoader);
-        if (freezerVersion == 2) {
-            Process.enableFreezer(classLoader, true);
-        }
         if (freezerVersion == 1 || freezerVersion == 2) {
             Log.i("Freezer V" + freezerVersion);
         } else {
