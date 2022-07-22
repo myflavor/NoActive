@@ -34,4 +34,5 @@ public class MethodEnum {
     public final static String isFreezerSupported = "isFreezerSupported";
     public final static String setProcessFrozen = "setProcessFrozen";
     public final static String enableFreezer = "enableFreezer";
+    public final static String useFreezer = "useFreezer";
 }

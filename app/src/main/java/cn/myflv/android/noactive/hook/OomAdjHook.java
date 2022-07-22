@@ -59,7 +59,7 @@ public class OomAdjHook extends XC_MethodHook {
 
         // 如果白名单应用或者进程就不处理
         if (memData.getWhiteApps().contains(packageName) || memData.getWhiteProcessList().contains(processName)) {
-            finalCurlAdj = processName.equals(packageName) ? 400 : 500;
+            finalCurlAdj = processName.equals(packageName) ? 500 : 700;
         } else {
             int curAdj;
             switch (type) {
@@ -72,7 +72,7 @@ public class OomAdjHook extends XC_MethodHook {
                 default:
                     return;
             }
-            finalCurlAdj = processName.equals(packageName) ? Math.min(curAdj, 500) : 999;
+            finalCurlAdj = processName.equals(packageName) ? Math.max(Math.min(curAdj, 700), 500) : 999;
         }
 
 

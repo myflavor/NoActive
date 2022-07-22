@@ -3,8 +3,6 @@ package cn.myflv.android.noactive;
 import android.content.Context;
 import android.os.Build;
 
-import java.io.File;
-
 import cn.myflv.android.noactive.entity.ClassEnum;
 import cn.myflv.android.noactive.entity.MemData;
 import cn.myflv.android.noactive.entity.MethodEnum;
@@ -12,7 +10,6 @@ import cn.myflv.android.noactive.hook.ANRHook;
 import cn.myflv.android.noactive.hook.AppSwitchHook;
 import cn.myflv.android.noactive.hook.BroadcastDeliverHook;
 import cn.myflv.android.noactive.hook.OomAdjHook;
-import cn.myflv.android.noactive.hook.ProcessKilledHook;
 import cn.myflv.android.noactive.utils.FreezerConfig;
 import cn.myflv.android.noactive.utils.Log;
 import de.robv.android.xposed.IXposedHookLoadPackage;
@@ -43,8 +40,19 @@ public class Hook implements IXposedHookLoadPackage {
         MemData memData = new MemData();
         ClassLoader classLoader = packageParam.classLoader;
 
+
 //        XposedHelpers.findAndHookMethod(ClassEnum.ProcessRecord, classLoader, MethodEnum.setKilled, boolean.class, new ProcessKilledHook());
 //        XposedHelpers.findAndHookMethod(ClassEnum.ProcessRecord, classLoader, MethodEnum.setKilledByAm, boolean.class, new ProcessKilledHook());
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            XposedHelpers.findAndHookMethod(ClassEnum.CachedAppOptimizer, classLoader, MethodEnum.useFreezer, new XC_MethodReplacement() {
+                @Override
+                protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
+                    Log.i("Disable cache freezer");
+                    return false;
+                }
+            });
+        }
 
         // Hook 切换事件
         XposedHelpers.findAndHookMethod(ClassEnum.ActivityManagerService, classLoader,
