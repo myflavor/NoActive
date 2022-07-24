@@ -51,14 +51,21 @@ public class AppSwitchHook extends XC_MethodHook {
             Object[] args = param.args;
             // 获取切换事件
             int event = (int) args[2];
-            // 如果切换事件不是暂停和继续就不处理
-            if (event != ACTIVITY_PAUSED && event != ACTIVITY_RESUMED) {
-                return;
-            }
-            // 获取AMS
-            ActivityManagerService activityManagerService = new ActivityManagerService(param.thisObject);
             // AMS有两个方法，但参数不同
             String packageName = type == SIMPLE ? (String) args[0] : new ComponentName(args[0]).getPackageName();
+
+            // 如果是进入前台
+            if (event == ACTIVITY_RESUMED) {
+                // 后台APP移除
+                memData.getAppBackgroundSet().remove(packageName);
+            } else if (event != ACTIVITY_PAUSED) {
+                // 不是进入前台或者后台就不处理
+                return;
+            }
+
+            // 获取AMS
+            ActivityManagerService activityManagerService = new ActivityManagerService(param.thisObject);
+
             // 获取用户ID
             int userId = (int) args[1];
             List<ProcessRecord> targetProcessRecords = getTargetProcessRecords(activityManagerService, packageName);
@@ -136,12 +143,9 @@ public class AppSwitchHook extends XC_MethodHook {
      */
     public void onResume(String packageName, List<ProcessRecord> targetProcessRecords) {
         Log.d(packageName + " resumed");
-        // 后台APP移除包名
-        memData.getAppBackgroundSet().remove(packageName);
         // 遍历目标进程列表
         for (ProcessRecord targetProcessRecord : targetProcessRecords) {
             // 解冻进程
-//            Process.unFreezer(classLoader, targetProcessRecord.getPid());
             freezeUtils.unFreezer(targetProcessRecord);
         }
     }
@@ -156,14 +160,8 @@ public class AppSwitchHook extends XC_MethodHook {
      */
     public void onPause(ActivityManagerService activityManagerService, String packageName, int userId, List<ProcessRecord> targetProcessRecords) {
         Log.d(packageName + " paused");
-        // 休眠0.5s
-        ThreadUtil.sleep(500);
-        // 如果不是白名单应用就调用应用休眠
-        if (!memData.getWhiteApps().contains(packageName)) {
-            activityManagerService.makePackageIdle(packageName, userId);
-        }
-        // 休眠2.5s
-        ThreadUtil.sleep(2500);
+        // 休眠3s
+        ThreadUtil.sleep(3000);
         // 应用是否前台
         boolean isAppForeground = isAppForeground(activityManagerService, targetProcessRecords);
         // 如果是前台应用就不处理
@@ -175,6 +173,10 @@ public class AppSwitchHook extends XC_MethodHook {
         memData.getAppBackgroundSet().add(packageName);
         // 遍历目标进程
         for (ProcessRecord targetProcessRecord : targetProcessRecords) {
+            // 应用又进入前台了
+            if (!memData.getAppBackgroundSet().contains(packageName)) {
+                return;
+            }
             // 目标进程名
             String processName = targetProcessRecord.getProcessName();
             // 目标进程PID
@@ -186,8 +188,6 @@ public class AppSwitchHook extends XC_MethodHook {
                 Process.kill(classLoader, pid);
             } else {
                 Log.d(processName + " freezer");
-                // 冻结进程
-//                Process.freezer(classLoader, pid);
                 freezeUtils.freezer(targetProcessRecord);
             }
         }

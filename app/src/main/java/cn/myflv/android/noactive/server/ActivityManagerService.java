@@ -22,10 +22,6 @@ public class ActivityManagerService {
         this.activeServices = new ActiveServices(XposedHelpers.getObjectField(activityManagerService, FieldEnum.mServices));
     }
 
-    public void makePackageIdle(String packageName, int userId) {
-        XposedHelpers.callMethod(activityManagerService, MethodEnum.makePackageIdle, packageName, userId);
-    }
-
     public boolean isAppForeground(int uid) {
         Class<?> clazz = activityManagerService.getClass();
         while (clazz != null && !clazz.getName().equals(Object.class.getName()) && !clazz.getName().equals(ClassEnum.ActivityManagerService)) {
