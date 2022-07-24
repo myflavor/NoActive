@@ -44,26 +44,26 @@ public class FreezerConfig {
         if (!configDir.exists()) {
             boolean mkdir = configDir.mkdir();
             if (!mkdir) return;
-            Log.i("init config dir");
+            Log.i("Init config dir");
         }
 
         if (!whiteApp.exists()) {
             createFile(whiteApp);
-            Log.i("init white app conf");
+            Log.i("Init white app conf");
         }
 
         if (!whiteProcess.exists()) {
             createFile(whiteProcess);
-            Log.i("init white process conf");
+            Log.i("Init white process conf");
         }
         if (!killProcess.exists()) {
             createFile(killProcess);
-            Log.i("init kill process conf");
+            Log.i("Init kill process conf");
         }
 
         if (!blackSystemApp.exists()) {
             createFile(blackSystemApp);
-            Log.i("init black system app conf");
+            Log.i("Init black system app conf");
         }
     }
 

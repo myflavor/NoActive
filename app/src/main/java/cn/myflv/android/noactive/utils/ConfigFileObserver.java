@@ -26,7 +26,7 @@ public class ConfigFileObserver extends FileObserver {
     public void startWatching() {
         super.startWatching();
         for (String file : files) {
-            Log.d("start monitor " + file);
+            Log.d("Start monitor " + file);
         }
     }
 
@@ -47,7 +47,7 @@ public class ConfigFileObserver extends FileObserver {
 
     public void reload() {
         for (String file : files) {
-            Log.d("reload " + file);
+            Log.d("Reload " + file);
             Set<String> newConfig = new HashSet<>(FreezerConfig.get(file));
             switch (file) {
                 case FreezerConfig.whiteAppConfig:

@@ -1,6 +1,7 @@
 package cn.myflv.android.noactive;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 
 import cn.myflv.android.noactive.entity.ClassEnum;
@@ -40,6 +41,7 @@ public class Hook implements IXposedHookLoadPackage {
         MemData memData = new MemData();
         ClassLoader classLoader = packageParam.classLoader;
 
+        Log.i(Build.MANUFACTURER + " device");
 
 //        XposedHelpers.findAndHookMethod(ClassEnum.ProcessRecord, classLoader, MethodEnum.setKilled, boolean.class, new ProcessKilledHook());
 //        XposedHelpers.findAndHookMethod(ClassEnum.ProcessRecord, classLoader, MethodEnum.setKilledByAm, boolean.class, new ProcessKilledHook());
@@ -55,17 +57,25 @@ public class Hook implements IXposedHookLoadPackage {
         }
 
         // Hook 切换事件
-        XposedHelpers.findAndHookMethod(ClassEnum.ActivityManagerService, classLoader,
-                MethodEnum.updateActivityUsageStats,
-                ClassEnum.ComponentName, int.class, int.class,
-                ClassEnum.IBinder, ClassEnum.ComponentName, new AppSwitchHook(classLoader, memData, AppSwitchHook.DIFFICULT));
+        if (Build.MANUFACTURER.equals("samsung")) {
+            XposedHelpers.findAndHookMethod(ClassEnum.ActivityManagerService, classLoader,
+                    MethodEnum.updateActivityUsageStats,
+                    ClassEnum.ComponentName, int.class, int.class,
+                    ClassEnum.IBinder, ClassEnum.ComponentName, Intent.class, new AppSwitchHook(classLoader, memData, AppSwitchHook.DIFFICULT));
+        } else {
+            XposedHelpers.findAndHookMethod(ClassEnum.ActivityManagerService, classLoader,
+                    MethodEnum.updateActivityUsageStats,
+                    ClassEnum.ComponentName, int.class, int.class,
+                    ClassEnum.IBinder, ClassEnum.ComponentName, new AppSwitchHook(classLoader, memData, AppSwitchHook.DIFFICULT));
+        }
+
 
         // Hook 广播分发
         XposedHelpers.findAndHookMethod(ClassEnum.BroadcastQueue, classLoader, MethodEnum.deliverToRegisteredReceiverLocked,
                 ClassEnum.BroadcastRecord,
                 ClassEnum.BroadcastFilter, boolean.class, int.class, new BroadcastDeliverHook(memData));
 
-        if (!FreezerConfig.isDisableOOM()){
+        if (!FreezerConfig.isDisableOOM()) {
             // Hook oom_adj
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 XposedHelpers.findAndHookMethod(ClassEnum.ProcessStateRecord, classLoader, MethodEnum.setCurAdj, int.class, new OomAdjHook(memData, OomAdjHook.Android_S));
