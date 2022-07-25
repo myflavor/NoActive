@@ -1,6 +1,7 @@
 package cn.myflv.android.noactive.utils;
 
 import android.os.Build;
+import android.os.Environment;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -23,8 +24,7 @@ public class FreezerConfig {
     public final static String disableOOM = "disable.oom";
     public final static String kill19 = "kill.19";
     public final static String kill20 = "kill.20";
-    public final static String mix19 = "mix.19";
-    public final static String mix20 = "mix.19";
+    public final static String freezerV2 = "freezer.v2";
 
     public static boolean isConfigOn(String configName) {
         File config = new File(ConfigDir, configName);
@@ -32,10 +32,10 @@ public class FreezerConfig {
     }
 
     public static int getKillSignal() {
-        if (FreezerConfig.isConfigOn(FreezerConfig.kill19) || FreezerConfig.isConfigOn(FreezerConfig.mix19)) {
+        if (FreezerConfig.isConfigOn(FreezerConfig.kill19)) {
             return 19;
         }
-        if (FreezerConfig.isConfigOn(FreezerConfig.kill20) || FreezerConfig.isConfigOn(FreezerConfig.mix20)) {
+        if (FreezerConfig.isConfigOn(FreezerConfig.kill20)) {
             return 20;
         }
         return -1;
@@ -43,6 +43,9 @@ public class FreezerConfig {
 
 
     public static int getFreezerVersion(ClassLoader classLoader) {
+        if (isConfigOn(freezerV2)) {
+            return 2;
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             Class<?> CachedAppOptimizer = XposedHelpers.findClass(ClassEnum.CachedAppOptimizer, classLoader);
             boolean isSupportV2 = (boolean) XposedHelpers.callStaticMethod(CachedAppOptimizer, MethodEnum.isFreezerSupported);

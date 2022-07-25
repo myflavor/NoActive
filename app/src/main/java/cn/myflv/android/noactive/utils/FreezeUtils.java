@@ -80,12 +80,14 @@ public class FreezeUtils {
     }
 
     public void unFreezer(ProcessRecord processRecord) {
-        if (freezerVersion == 2) {
-            thawPid(processRecord.getPid(), processRecord.getUid());
-        } else if (freezerVersion == 1) {
-            thawPid(processRecord.getPid());
-        } else {
+        if (useKill) {
             Process.cont(classLoader, processRecord.getPid());
+        } else {
+            if (freezerVersion == 2) {
+                thawPid(processRecord.getPid(), processRecord.getUid());
+            } else {
+                thawPid(processRecord.getPid());
+            }
         }
     }
 
