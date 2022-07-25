@@ -32,10 +32,10 @@ public class FreezerConfig {
     }
 
     public static int getKillSignal() {
-        if (FreezerConfig.isConfigOn(FreezerConfig.kill19)) {
+        if (isConfigOn(kill19)) {
             return 19;
         }
-        if (FreezerConfig.isConfigOn(FreezerConfig.kill20)) {
+        if (isConfigOn(kill20)) {
             return 20;
         }
         return -1;
