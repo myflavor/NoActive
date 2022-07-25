@@ -10,6 +10,8 @@ import cn.myflv.android.noactive.entity.MethodEnum;
 import cn.myflv.android.noactive.hook.ANRHook;
 import cn.myflv.android.noactive.hook.AppSwitchHook;
 import cn.myflv.android.noactive.hook.BroadcastDeliverHook;
+import cn.myflv.android.noactive.hook.CacheFreezerHook;
+import cn.myflv.android.noactive.hook.MilletHook;
 import cn.myflv.android.noactive.hook.OomAdjHook;
 import cn.myflv.android.noactive.utils.FreezerConfig;
 import cn.myflv.android.noactive.utils.Log;
@@ -26,12 +28,7 @@ public class Hook implements IXposedHookLoadPackage {
         // 禁用 millet
         if (packageParam.packageName.equals("com.miui.powerkeeper")) {
             try {
-                XposedHelpers.findAndHookMethod(ClassEnum.MilletConfig, packageParam.classLoader, MethodEnum.getEnable, Context.class, new XC_MethodReplacement() {
-                    @Override
-                    protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
-                        return false;
-                    }
-                });
+                XposedHelpers.findAndHookMethod(ClassEnum.MilletConfig, packageParam.classLoader, MethodEnum.getEnable, Context.class, new MilletHook());
                 XposedBridge.log("NoActive -> Disable millet");
             } catch (Exception ignored) {
             }
@@ -47,12 +44,7 @@ public class Hook implements IXposedHookLoadPackage {
 //        XposedHelpers.findAndHookMethod(ClassEnum.ProcessRecord, classLoader, MethodEnum.setKilledByAm, boolean.class, new ProcessKilledHook());
 
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.Q) {
-            XposedHelpers.findAndHookMethod(ClassEnum.CachedAppOptimizer, classLoader, MethodEnum.useFreezer, new XC_MethodReplacement() {
-                @Override
-                protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
-                    return false;
-                }
-            });
+            XposedHelpers.findAndHookMethod(ClassEnum.CachedAppOptimizer, classLoader, MethodEnum.useFreezer, new CacheFreezerHook());
             Log.i("Disable cache freezer");
         }
 
