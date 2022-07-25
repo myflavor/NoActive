@@ -1,7 +1,9 @@
 package cn.myflv.android.noactive.hook;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import cn.myflv.android.noactive.entity.MemData;
 import cn.myflv.android.noactive.server.ActivityManagerService;
@@ -28,6 +30,7 @@ public class AppSwitchHook extends XC_MethodHook {
     private final MemData memData;
     private final FreezeUtils freezeUtils;
 
+    private final Map<String, Long> freezerTokenMap = new HashMap<>();
 
     public AppSwitchHook(ClassLoader classLoader, MemData memData, int type) {
         this.classLoader = classLoader;
@@ -156,8 +159,13 @@ public class AppSwitchHook extends XC_MethodHook {
      */
     public void onPause(ActivityManagerService activityManagerService, String packageName) {
         Log.d(packageName + " paused");
+        long token = System.currentTimeMillis();
+        setToken(packageName, token);
         // 休眠3s
         ThreadUtil.sleep(3000);
+        if (!isCorrectToken(packageName, token)) {
+            return;
+        }
         List<ProcessRecord> targetProcessRecords = getTargetProcessRecords(activityManagerService, packageName);
         // 如果目标进程为空就不处理
         if (targetProcessRecords.isEmpty()) {
@@ -214,5 +222,14 @@ public class AppSwitchHook extends XC_MethodHook {
         return false;
     }
 
+
+    public void setToken(String packageName, long token) {
+        freezerTokenMap.put(packageName, token);
+    }
+
+    public boolean isCorrectToken(String packageName, long value) {
+        Long token = freezerTokenMap.get(packageName);
+        return token != null && value == token;
+    }
 
 }
