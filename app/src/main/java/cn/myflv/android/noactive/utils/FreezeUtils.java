@@ -31,7 +31,6 @@ public class FreezeUtils {
     private final ClassLoader classLoader;
     private final int freezerVersion;
     private final int killSignal;
-    private final boolean mixFreezer;
     private final boolean useKill;
 
 
@@ -39,16 +38,11 @@ public class FreezeUtils {
         this.classLoader = classLoader;
         this.freezerVersion = FreezerConfig.getFreezerVersion(classLoader);
         this.killSignal = FreezerConfig.getKillSignal();
-        this.mixFreezer = FreezerConfig.isMixFreezer();
         this.useKill = FreezerConfig.isUseKill();
         if (useKill) {
             Log.i("Kill -" + killSignal);
         } else {
-            if (mixFreezer) {
-                Log.i("Kill -" + killSignal + " & Freezer V" + freezerVersion);
-            } else {
-                Log.i("Freezer V" + freezerVersion);
-            }
+            Log.i("Freezer V" + freezerVersion);
         }
     }
 
@@ -75,27 +69,14 @@ public class FreezeUtils {
 
     public void freezer(ProcessRecord processRecord) {
         if (useKill) {
-            if (freezerVersion == 2) {
-                if (mixFreezer) {
-                    Process.stop(classLoader, processRecord.getPid(), killSignal);
-                    freezePid(processRecord.getPid(), processRecord.getUid());
-                    Process.cont(classLoader, processRecord.getPid());
-                } else {
-                    freezePid(processRecord.getPid(), processRecord.getUid());
-                }
-            } else {
-                if (mixFreezer) {
-                    Process.stop(classLoader, processRecord.getPid(), killSignal);
-                    freezePid(processRecord.getPid());
-                    Process.cont(classLoader, processRecord.getPid());
-                } else {
-                    freezePid(processRecord.getPid());
-                }
-            }
+            Process.stop(classLoader, processRecord.getPid(), killSignal);
         } else {
-            Process.stop(classLoader, processRecord.getPid(), freezerVersion);
+            if (freezerVersion == 2) {
+                freezePid(processRecord.getPid(), processRecord.getUid());
+            } else {
+                freezePid(processRecord.getPid());
+            }
         }
-
     }
 
     public void unFreezer(ProcessRecord processRecord) {

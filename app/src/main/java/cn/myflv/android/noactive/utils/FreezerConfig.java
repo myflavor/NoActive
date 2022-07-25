@@ -54,10 +54,6 @@ public class FreezerConfig {
     }
 
 
-    public static boolean isMixFreezer() {
-        return isConfigOn(mix19) || isConfigOn(mix20);
-    }
-
     public static boolean isUseKill() {
         return isConfigOn(kill19) || isConfigOn(kill20);
     }
