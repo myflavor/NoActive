@@ -66,19 +66,12 @@ public class AppSwitchHook extends XC_MethodHook {
             // 获取AMS
             ActivityManagerService activityManagerService = new ActivityManagerService(param.thisObject);
 
-            // 获取用户ID
-            int userId = (int) args[1];
-            List<ProcessRecord> targetProcessRecords = getTargetProcessRecords(activityManagerService, packageName);
-            // 如果目标进程为空就不处理
-            if (targetProcessRecords.isEmpty()) {
-                return;
-            }
             if (event == ACTIVITY_PAUSED) {
                 //暂停事件
-                onPause(activityManagerService, packageName, userId, targetProcessRecords);
+                onPause(activityManagerService, packageName);
             } else {
                 //继续事件
-                onResume(packageName, targetProcessRecords);
+                onResume(activityManagerService, packageName);
             }
         }).start();
     }
@@ -138,10 +131,15 @@ public class AppSwitchHook extends XC_MethodHook {
     /**
      * APP切换至前台
      *
-     * @param packageName          包名
-     * @param targetProcessRecords 目标进程列表
+     * @param packageName            包名
+     * @param activityManagerService AMS
      */
-    public void onResume(String packageName, List<ProcessRecord> targetProcessRecords) {
+    public void onResume(ActivityManagerService activityManagerService, String packageName) {
+        List<ProcessRecord> targetProcessRecords = getTargetProcessRecords(activityManagerService, packageName);
+        // 如果目标进程为空就不处理
+        if (targetProcessRecords.isEmpty()) {
+            return;
+        }
         Log.d(packageName + " resumed");
         // 遍历目标进程列表
         for (ProcessRecord targetProcessRecord : targetProcessRecords) {
@@ -155,13 +153,16 @@ public class AppSwitchHook extends XC_MethodHook {
      *
      * @param activityManagerService AMS
      * @param packageName            包名
-     * @param userId                 用户ID
-     * @param targetProcessRecords   目标进程列表
      */
-    public void onPause(ActivityManagerService activityManagerService, String packageName, int userId, List<ProcessRecord> targetProcessRecords) {
+    public void onPause(ActivityManagerService activityManagerService, String packageName) {
         Log.d(packageName + " paused");
         // 休眠3s
         ThreadUtil.sleep(3000);
+        List<ProcessRecord> targetProcessRecords = getTargetProcessRecords(activityManagerService, packageName);
+        // 如果目标进程为空就不处理
+        if (targetProcessRecords.isEmpty()) {
+            return;
+        }
         // 应用是否前台
         boolean isAppForeground = isAppForeground(activityManagerService, targetProcessRecords);
         // 如果是前台应用就不处理

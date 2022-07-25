@@ -11,10 +11,9 @@ public class ReceiverList {
 
     public ReceiverList(Object receiverList) {
         this.receiverList = receiverList;
-        try{
+        try {
             this.processRecord = new ProcessRecord(XposedHelpers.getObjectField(receiverList, FieldEnum.app));
-        }catch (Exception ignored){
-
+        } catch (Exception ignored) {
         }
     }
 
