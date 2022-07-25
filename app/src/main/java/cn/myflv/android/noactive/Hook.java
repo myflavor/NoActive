@@ -67,7 +67,7 @@ public class Hook implements IXposedHookLoadPackage {
                 ClassEnum.BroadcastRecord,
                 ClassEnum.BroadcastFilter, boolean.class, int.class, new BroadcastDeliverHook(memData));
 
-        if (!FreezerConfig.isDisableOOM()) {
+        if (!FreezerConfig.isConfigOn(FreezerConfig.disableOOM)) {
             // Hook oom_adj
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 XposedHelpers.findAndHookMethod(ClassEnum.ProcessStateRecord, classLoader, MethodEnum.setCurAdj, int.class, new OomAdjHook(memData, OomAdjHook.Android_S));

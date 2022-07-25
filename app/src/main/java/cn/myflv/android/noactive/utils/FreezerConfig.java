@@ -1,5 +1,7 @@
 package cn.myflv.android.noactive.utils;
 
+import android.os.Build;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -7,6 +9,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+
+import cn.myflv.android.noactive.entity.ClassEnum;
+import cn.myflv.android.noactive.entity.MethodEnum;
+import de.robv.android.xposed.XposedHelpers;
 
 public class FreezerConfig {
     public final static String ConfigDir = "/data/system/NoActive";
@@ -17,21 +23,43 @@ public class FreezerConfig {
     public final static String disableOOM = "disable.oom";
     public final static String kill19 = "kill.19";
     public final static String kill20 = "kill.20";
+    public final static String mix19 = "mix.19";
+    public final static String mix20 = "mix.19";
 
-    public static boolean isKill19() {
-        File config = new File(ConfigDir,kill19);
+    public static boolean isConfigOn(String configName) {
+        File config = new File(ConfigDir, configName);
         return config.exists();
     }
 
-    public static boolean isKill20() {
-        File config = new File(ConfigDir,kill20);
-        return config.exists();
+    public static int getKillSignal() {
+        if (FreezerConfig.isConfigOn(FreezerConfig.kill19) || FreezerConfig.isConfigOn(FreezerConfig.mix19)) {
+            return 19;
+        }
+        if (FreezerConfig.isConfigOn(FreezerConfig.kill20) || FreezerConfig.isConfigOn(FreezerConfig.mix20)) {
+            return 20;
+        }
+        return -1;
     }
 
 
-    public static boolean isDisableOOM() {
-        File config = new File(ConfigDir,disableOOM);
-        return config.exists();
+    public static int getFreezerVersion(ClassLoader classLoader) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            Class<?> CachedAppOptimizer = XposedHelpers.findClass(ClassEnum.CachedAppOptimizer, classLoader);
+            boolean isSupportV2 = (boolean) XposedHelpers.callStaticMethod(CachedAppOptimizer, MethodEnum.isFreezerSupported);
+            if (isSupportV2) {
+                return 2;
+            }
+        }
+        return 1;
+    }
+
+
+    public static boolean isMixFreezer() {
+        return isConfigOn(mix19) || isConfigOn(mix20);
+    }
+
+    public static boolean isUseKill() {
+        return isConfigOn(kill19) || isConfigOn(kill20);
     }
 
 

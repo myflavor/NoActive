@@ -30,34 +30,26 @@ public class FreezeUtils {
 
     private final ClassLoader classLoader;
     private final int freezerVersion;
+    private final int killSignal;
+    private final boolean mixFreezer;
+    private final boolean useKill;
 
 
     public FreezeUtils(ClassLoader classLoader) {
         this.classLoader = classLoader;
-        this.freezerVersion = getFreezerVersion(classLoader);
-        if (freezerVersion == 1 || freezerVersion == 2) {
-            Log.i("Freezer V" + freezerVersion);
+        this.freezerVersion = FreezerConfig.getFreezerVersion(classLoader);
+        this.killSignal = FreezerConfig.getKillSignal();
+        this.mixFreezer = FreezerConfig.isMixFreezer();
+        this.useKill = FreezerConfig.isUseKill();
+        if (useKill) {
+            Log.i("Kill -" + killSignal);
         } else {
-            Log.i("Kill -" + freezerVersion);
-        }
-    }
-
-
-    public static int getFreezerVersion(ClassLoader classLoader) {
-        if (FreezerConfig.isKill19()) {
-            return 19;
-        }
-        if (FreezerConfig.isKill20()) {
-            return 20;
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            Class<?> CachedAppOptimizer = XposedHelpers.findClass(ClassEnum.CachedAppOptimizer, classLoader);
-            boolean isSupportV2 = (boolean) XposedHelpers.callStaticMethod(CachedAppOptimizer, MethodEnum.isFreezerSupported);
-            if (isSupportV2) {
-                return 2;
+            if (mixFreezer) {
+                Log.i("Kill -" + killSignal + " & Freezer V" + freezerVersion);
+            } else {
+                Log.i("Freezer V" + freezerVersion);
             }
         }
-        return 1;
     }
 
 
@@ -82,10 +74,24 @@ public class FreezeUtils {
     }
 
     public void freezer(ProcessRecord processRecord) {
-        if (freezerVersion == 2) {
-            freezePid(processRecord.getPid(), processRecord.getUid());
-        } else if (freezerVersion == 1) {
-            freezePid(processRecord.getPid());
+        if (useKill) {
+            if (freezerVersion == 2) {
+                if (mixFreezer) {
+                    Process.stop(classLoader, processRecord.getPid(), killSignal);
+                    freezePid(processRecord.getPid(), processRecord.getUid());
+                    Process.cont(classLoader, processRecord.getPid());
+                } else {
+                    freezePid(processRecord.getPid(), processRecord.getUid());
+                }
+            } else {
+                if (mixFreezer) {
+                    Process.stop(classLoader, processRecord.getPid(), killSignal);
+                    freezePid(processRecord.getPid());
+                    Process.cont(classLoader, processRecord.getPid());
+                } else {
+                    freezePid(processRecord.getPid());
+                }
+            }
         } else {
             Process.stop(classLoader, processRecord.getPid(), freezerVersion);
         }
