@@ -72,7 +72,8 @@ public class OomAdjHook extends XC_MethodHook {
                 default:
                     return;
             }
-            finalCurlAdj = processName.equals(packageName) ? Math.max(Math.min(curAdj, 700), 500) : 999;
+            finalCurlAdj = processName.equals(packageName) ? Math.max(Math.min(curAdj, 700), 500) : 900;
+            finalCurlAdj = finalCurlAdj + memData.getBackgroundIndex(packageName);
         }
 
 
