@@ -148,7 +148,6 @@ public class AppSwitchHook extends XC_MethodHook {
         for (ProcessRecord targetProcessRecord : targetProcessRecords) {
             // 确保APP不在后台
             if (memData.getAppBackgroundSet().contains(packageName)) {
-                // 此时不能调用onPause
                 return;
             }
             // 解冻进程
@@ -190,7 +189,6 @@ public class AppSwitchHook extends XC_MethodHook {
             // 应用又进入前台了
             if (!memData.getAppBackgroundSet().contains(packageName)) {
                 // 为保证解冻顺利
-                onResume(activityManagerService, packageName);
                 return;
             }
             // 目标进程名
