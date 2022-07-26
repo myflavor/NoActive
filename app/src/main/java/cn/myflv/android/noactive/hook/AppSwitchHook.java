@@ -1,5 +1,7 @@
 package cn.myflv.android.noactive.hook;
 
+import android.os.Process;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,7 +12,6 @@ import cn.myflv.android.noactive.server.ActivityManagerService;
 import cn.myflv.android.noactive.server.ApplicationInfo;
 import cn.myflv.android.noactive.server.ComponentName;
 import cn.myflv.android.noactive.server.Event;
-import cn.myflv.android.noactive.server.Process;
 import cn.myflv.android.noactive.server.ProcessList;
 import cn.myflv.android.noactive.server.ProcessRecord;
 import cn.myflv.android.noactive.utils.FreezeUtils;
@@ -26,14 +27,11 @@ public class AppSwitchHook extends XC_MethodHook {
     public final static int DIFFICULT = 2;
     private final int type;
 
-    private final ClassLoader classLoader;
     private final MemData memData;
     private final FreezeUtils freezeUtils;
-
     private final Map<String, Long> freezerTokenMap = new HashMap<>();
 
     public AppSwitchHook(ClassLoader classLoader, MemData memData, int type) {
-        this.classLoader = classLoader;
         this.ACTIVITY_RESUMED = Event.ACTIVITY_RESUMED(classLoader);
         this.ACTIVITY_PAUSED = Event.ACTIVITY_PAUSED(classLoader);
         this.memData = memData;
@@ -68,7 +66,18 @@ public class AppSwitchHook extends XC_MethodHook {
 
             // 获取AMS
             ActivityManagerService activityManagerService = new ActivityManagerService(param.thisObject);
-
+            // 重要系统APP
+            boolean isImportantSystemApp = activityManagerService.isImportantSystemApp(packageName);
+            if (isImportantSystemApp) {
+                Log.d(packageName + " is important system app");
+                return;
+            }
+            // 系统APP
+            boolean isSystem = activityManagerService.isSystem(packageName);
+            // 判断是否白名单系统APP
+            if (isSystem && !memData.getBlackSystemApps().contains(packageName)) {
+                Log.d(packageName + " is white system app");
+            }
             if (event == ACTIVITY_PAUSED) {
                 //暂停事件
                 onPause(activityManagerService, packageName);
@@ -107,12 +116,6 @@ public class AppSwitchHook extends XC_MethodHook {
                 // 如果进程名称不是包名开头就跳过
                 if (!processName.startsWith(packageName)) {
                     continue;
-                }
-                // 如果系统黑名单不包含包名并且是系统应用并且进程名是包名开头(APP调用的WebView是系统APP)
-                if (applicationInfo.getUid() < 10000 || (!memData.getBlackSystemApps().contains(packageName) && applicationInfo.isSystem())) {
-                    Log.d(packageName + " is white system app");
-                    // 直接返回空列表
-                    return new ArrayList<>();
                 }
                 // 如果白名单进程包含进程则跳过
                 if (memData.getWhiteProcessList().contains(processName)) {
@@ -170,20 +173,24 @@ public class AppSwitchHook extends XC_MethodHook {
         if (!isCorrectToken(packageName, token)) {
             return;
         }
-        List<ProcessRecord> targetProcessRecords = getTargetProcessRecords(activityManagerService, packageName);
-        // 如果目标进程为空就不处理
-        if (targetProcessRecords.isEmpty()) {
-            return;
-        }
+
         // 应用是否前台
-        boolean isAppForeground = isAppForeground(activityManagerService, targetProcessRecords);
+        boolean isAppForeground = activityManagerService.isAppForeground(packageName);
         // 如果是前台应用就不处理
         if (isAppForeground) {
             Log.d(packageName + " is in foreground");
             return;
         }
+
         // 后台应用添加包名
         memData.getAppBackgroundSet().add(packageName);
+
+        List<ProcessRecord> targetProcessRecords = getTargetProcessRecords(activityManagerService, packageName);
+        // 如果目标进程为空就不处理
+        if (targetProcessRecords.isEmpty()) {
+            return;
+        }
+
         // 遍历目标进程
         for (ProcessRecord targetProcessRecord : targetProcessRecords) {
             // 应用又进入前台了
@@ -199,32 +206,12 @@ public class AppSwitchHook extends XC_MethodHook {
             if (memData.getKillProcessList().contains(processName)) {
                 Log.d(processName + " kill");
                 // 杀死进程
-                Process.kill(classLoader, pid);
+                Process.killProcess(pid);
             } else {
                 Log.d(processName + " freezer");
                 freezeUtils.freezer(targetProcessRecord);
             }
         }
-    }
-
-    /**
-     * APP是否前台
-     *
-     * @param activityManagerService AMS
-     * @param targetProcessRecords   目标进程列表
-     * @return 是否前台
-     */
-    public boolean isAppForeground(ActivityManagerService activityManagerService, List<ProcessRecord> targetProcessRecords) {
-        for (ProcessRecord targetProcessRecord : targetProcessRecords) {
-            if (targetProcessRecord.isNull()) {
-                continue;
-            }
-            boolean appForeground = activityManagerService.isAppForeground(targetProcessRecord.getUid());
-            if (appForeground) {
-                return true;
-            }
-        }
-        return false;
     }
 
 

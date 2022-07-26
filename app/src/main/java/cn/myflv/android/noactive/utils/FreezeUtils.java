@@ -3,7 +3,7 @@
 //
 package cn.myflv.android.noactive.utils;
 
-import android.os.Build;
+import android.os.Process;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -12,14 +12,11 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.myflv.android.noactive.entity.ClassEnum;
-import cn.myflv.android.noactive.entity.MethodEnum;
-import cn.myflv.android.noactive.server.Process;
 import cn.myflv.android.noactive.server.ProcessRecord;
-import de.robv.android.xposed.XposedHelpers;
 
 public class FreezeUtils {
 
+    private final static int CONT = 18;
 
     private static final int FREEZE_ACTION = 1;
     private static final int UNFREEZE_ACTION = 0;
@@ -28,19 +25,17 @@ public class FreezeUtils {
     private static final String V1_FREEZER_FROZEN_PORCS = "/sys/fs/cgroup/freezer/perf/frozen/cgroup.procs";
     private static final String V1_FREEZER_THAWED_PORCS = "/sys/fs/cgroup/freezer/perf/thawed/cgroup.procs";
 
-    private final ClassLoader classLoader;
     private final int freezerVersion;
-    private final int killSignal;
+    private final int stopSignal;
     private final boolean useKill;
 
 
     public FreezeUtils(ClassLoader classLoader) {
-        this.classLoader = classLoader;
         this.freezerVersion = FreezerConfig.getFreezerVersion(classLoader);
-        this.killSignal = FreezerConfig.getKillSignal();
+        this.stopSignal = FreezerConfig.getKillSignal();
         this.useKill = FreezerConfig.isUseKill();
         if (useKill) {
-            Log.i("Kill -" + killSignal);
+            Log.i("Kill -" + stopSignal);
         } else {
             Log.i("Freezer V" + freezerVersion);
         }
@@ -69,7 +64,7 @@ public class FreezeUtils {
 
     public void freezer(ProcessRecord processRecord) {
         if (useKill) {
-            Process.stop(classLoader, processRecord.getPid(), killSignal);
+            Process.sendSignal(processRecord.getPid(), stopSignal);
         } else {
             if (freezerVersion == 2) {
                 freezePid(processRecord.getPid(), processRecord.getUid());
@@ -81,7 +76,7 @@ public class FreezeUtils {
 
     public void unFreezer(ProcessRecord processRecord) {
         if (useKill) {
-            Process.cont(classLoader, processRecord.getPid());
+            Process.sendSignal(processRecord.getPid(), CONT);
         } else {
             if (freezerVersion == 2) {
                 thawPid(processRecord.getPid(), processRecord.getUid());

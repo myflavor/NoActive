@@ -11,9 +11,9 @@
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 105,
-      "versionName": "0.9.3",
-      "outputFile": "NoActive-v0.9.3.apk"
+      "versionCode": 125,
+      "versionName": "0.9.6-R",
+      "outputFile": "NoActive-v0.9.6-R.apk"
     }
   ],
   "elementType": "File"

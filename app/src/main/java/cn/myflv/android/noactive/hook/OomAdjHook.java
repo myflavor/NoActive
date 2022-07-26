@@ -2,31 +2,35 @@ package cn.myflv.android.noactive.hook;
 
 import cn.myflv.android.noactive.entity.MemData;
 import cn.myflv.android.noactive.server.ApplicationInfo;
+import cn.myflv.android.noactive.server.ProcessList;
 import cn.myflv.android.noactive.server.ProcessRecord;
 import cn.myflv.android.noactive.server.ProcessStateRecord;
+import cn.myflv.android.noactive.utils.Log;
 import de.robv.android.xposed.XC_MethodHook;
 
 public class OomAdjHook extends XC_MethodHook {
+    private final ClassLoader classLoader;
     private final MemData memData;
     private final int type;
     public final static int Android_S = 1;
     public final static int Android_Q_R = 2;
+    public final static int Color = 3;
 
-    public OomAdjHook(MemData memData, int type) {
+    public OomAdjHook(ClassLoader classLoader, MemData memData, int type) {
+        this.classLoader = classLoader;
         this.memData = memData;
         this.type = type;
     }
 
 
-    @Override
-    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-        super.beforeHookedMethod(param);
+    public void computeOomAdj(MethodHookParam param) {
         ProcessRecord processRecord;
         switch (type) {
             case Android_S:
                 processRecord = new ProcessStateRecord(param.thisObject).getProcessRecord();
                 break;
             case Android_Q_R:
+            case Color:
                 processRecord = new ProcessRecord(param.args[0]);
                 break;
             default:
@@ -69,12 +73,17 @@ public class OomAdjHook extends XC_MethodHook {
                 case Android_Q_R:
                     curAdj = processRecord.getCurAdj();
                     break;
+                case Color:
+                    curAdj = 500;
+                    break;
                 default:
                     return;
             }
             finalCurlAdj = processName.equals(packageName) ? Math.max(Math.min(curAdj, 700), 500) : 900;
             finalCurlAdj = finalCurlAdj + memData.getBackgroundIndex(packageName);
         }
+
+        Log.d(processName + " -> " + finalCurlAdj);
 
 
         switch (type) {
@@ -83,8 +92,27 @@ public class OomAdjHook extends XC_MethodHook {
                 break;
             case Android_Q_R:
                 processRecord.setCurAdj(finalCurlAdj);
+            case Color:
+                ProcessList.setOomAdj(classLoader, processRecord.getPid(), processRecord.getUid(), finalCurlAdj);
                 break;
             default:
+        }
+
+    }
+
+    @Override
+    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+        super.beforeHookedMethod(param);
+        if (type != Color) {
+            computeOomAdj(param);
+        }
+    }
+
+    @Override
+    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+        super.afterHookedMethod(param);
+        if (type == Color) {
+            computeOomAdj(param);
         }
     }
 }

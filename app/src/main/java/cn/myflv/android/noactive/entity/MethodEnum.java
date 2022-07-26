@@ -35,4 +35,6 @@ public class MethodEnum {
     public final static String setProcessFrozen = "setProcessFrozen";
     public final static String enableFreezer = "enableFreezer";
     public final static String useFreezer = "useFreezer";
+    public final static String computeOomAdjLSP = "computeOomAdjLSP";
+    public final static String setOomAdj = "setOomAdj";
 }
