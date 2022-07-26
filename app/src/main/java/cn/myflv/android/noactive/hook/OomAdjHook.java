@@ -92,6 +92,7 @@ public class OomAdjHook extends XC_MethodHook {
                 break;
             case Android_Q_R:
                 processRecord.setCurAdj(finalCurlAdj);
+                break;
             case Color:
                 ProcessList.setOomAdj(classLoader, processRecord.getPid(), processRecord.getUid(), finalCurlAdj);
                 break;

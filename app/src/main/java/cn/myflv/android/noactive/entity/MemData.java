@@ -2,6 +2,8 @@ package cn.myflv.android.noactive.entity;
 
 import android.os.FileObserver;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -15,7 +17,7 @@ public class MemData {
     private Set<String> blackSystemApps = new HashSet<>();
     private Set<String> whiteProcessList = new HashSet<>();
     private Set<String> killProcessList = new HashSet<>();
-    private Set<String> appBackgroundSet = new LinkedHashSet<>();
+    private Set<String> appBackgroundSet = Collections.synchronizedSet(new LinkedHashSet<>());
     private final FileObserver fileObserver = new ConfigFileObserver(this);
 
     public MemData() {
