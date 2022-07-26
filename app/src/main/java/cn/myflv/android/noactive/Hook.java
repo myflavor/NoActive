@@ -72,8 +72,13 @@ public class Hook implements IXposedHookLoadPackage {
             // Hook oom_adj
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 if (FreezerConfig.isColorOs()) {
+                    Log.i("Hello ColorOS");
                     XposedHelpers.findAndHookMethod(ClassEnum.OomAdjuster, classLoader, MethodEnum.computeOomAdjLSP, ClassEnum.ProcessRecord, int.class, ClassEnum.ProcessRecord, boolean.class, long.class, boolean.class, boolean.class, new OomAdjHook(classLoader, memData, OomAdjHook.Color));
                 } else {
+                    if (Build.MANUFACTURER.equals("OPPO")|| Build.MANUFACTURER.equals("OnePlus")){
+                        Log.i("If you are using ColorOS");
+                        Log.i("You can create file color.os");
+                    }
                     XposedHelpers.findAndHookMethod(ClassEnum.ProcessStateRecord, classLoader, MethodEnum.setCurAdj, int.class, new OomAdjHook(classLoader, memData, OomAdjHook.Android_S));
                 }
                 Log.i("Auto lmk");
