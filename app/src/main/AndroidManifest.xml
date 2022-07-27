@@ -8,6 +8,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true">
         <meta-data
+            android:name="xposedmodule"
+            android:value="true" />
+        <meta-data
             android:name="xposedscope"
             android:resource="@array/xposed_scope" />
 
