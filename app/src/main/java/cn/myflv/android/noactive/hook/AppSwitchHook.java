@@ -206,7 +206,7 @@ public class AppSwitchHook extends XC_MethodHook {
             if (memData.getKillProcessList().contains(processName)) {
                 Log.d(processName + " kill");
                 // 杀死进程
-                Process.killProcess(pid);
+                FreezeUtils.kill(pid);
             } else {
                 Log.d(processName + " freezer");
                 freezeUtils.freezer(targetProcessRecord);

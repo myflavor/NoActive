@@ -63,31 +63,27 @@ public class FreezeUtils {
     }
 
     public void freezer(ProcessRecord processRecord) {
-        new Thread(() -> {
-            if (useKill) {
-                Process.sendSignal(processRecord.getPid(), stopSignal);
+        if (useKill) {
+            Process.sendSignal(processRecord.getPid(), stopSignal);
+        } else {
+            if (freezerVersion == 2) {
+                freezePid(processRecord.getPid(), processRecord.getUid());
             } else {
-                if (freezerVersion == 2) {
-                    freezePid(processRecord.getPid(), processRecord.getUid());
-                } else {
-                    freezePid(processRecord.getPid());
-                }
+                freezePid(processRecord.getPid());
             }
-        }).start();
+        }
     }
 
     public void unFreezer(ProcessRecord processRecord) {
-        new Thread(() -> {
-            if (useKill) {
-                Process.sendSignal(processRecord.getPid(), CONT);
+        if (useKill) {
+            Process.sendSignal(processRecord.getPid(), CONT);
+        } else {
+            if (freezerVersion == 2) {
+                thawPid(processRecord.getPid(), processRecord.getUid());
             } else {
-                if (freezerVersion == 2) {
-                    thawPid(processRecord.getPid(), processRecord.getUid());
-                } else {
-                    thawPid(processRecord.getPid());
-                }
+                thawPid(processRecord.getPid());
             }
-        }).start();
+        }
     }
 
     public static boolean isFrozonPid(int pid) {
@@ -136,5 +132,9 @@ public class FreezeUtils {
 
     public static void freezePid(int pid, int uid) {
         setFreezeAction(pid, uid, true);
+    }
+
+    public static void kill(int pid) {
+        Process.killProcess(pid);
     }
 }
