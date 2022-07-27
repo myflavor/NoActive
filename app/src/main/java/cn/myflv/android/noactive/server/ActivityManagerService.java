@@ -2,6 +2,7 @@ package cn.myflv.android.noactive.server;
 
 
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -76,5 +77,6 @@ public class ActivityManagerService {
         }
         return null;
     }
+
 
 }

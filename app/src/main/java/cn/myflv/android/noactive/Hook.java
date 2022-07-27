@@ -62,23 +62,23 @@ public class Hook implements IXposedHookLoadPackage {
                     ClassEnum.IBinder, ClassEnum.ComponentName, new AppSwitchHook(classLoader, memData, AppSwitchHook.DIFFICULT));
         }
 
-
         // Hook 广播分发
         XposedHelpers.findAndHookMethod(ClassEnum.BroadcastQueue, classLoader, MethodEnum.deliverToRegisteredReceiverLocked,
                 ClassEnum.BroadcastRecord,
                 ClassEnum.BroadcastFilter, boolean.class, int.class, new BroadcastDeliverHook(memData));
 
         if (!FreezerConfig.isConfigOn(FreezerConfig.disableOOM)) {
+            boolean colorOs = FreezerConfig.isColorOs();
+            if (!colorOs && (Build.MANUFACTURER.equals("OPPO") || Build.MANUFACTURER.equals("OnePlus"))) {
+                Log.i("If you are using ColorOS");
+                Log.i("You can create file color.os");
+            }
             // Hook oom_adj
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                if (FreezerConfig.isColorOs()) {
+                if (colorOs) {
                     Log.i("Hello ColorOS");
                     XposedHelpers.findAndHookMethod(ClassEnum.OomAdjuster, classLoader, MethodEnum.computeOomAdjLSP, ClassEnum.ProcessRecord, int.class, ClassEnum.ProcessRecord, boolean.class, long.class, boolean.class, boolean.class, new OomAdjHook(classLoader, memData, OomAdjHook.Color));
                 } else {
-                    if (Build.MANUFACTURER.equals("OPPO")|| Build.MANUFACTURER.equals("OnePlus")){
-                        Log.i("If you are using ColorOS");
-                        Log.i("You can create file color.os");
-                    }
                     XposedHelpers.findAndHookMethod(ClassEnum.ProcessStateRecord, classLoader, MethodEnum.setCurAdj, int.class, new OomAdjHook(classLoader, memData, OomAdjHook.Android_S));
                 }
                 Log.i("Auto lmk");

@@ -1,5 +1,6 @@
 package cn.myflv.android.noactive.hook;
 
+import cn.myflv.android.noactive.entity.FieldEnum;
 import cn.myflv.android.noactive.entity.MemData;
 import cn.myflv.android.noactive.server.ApplicationInfo;
 import cn.myflv.android.noactive.server.BroadcastFilter;
@@ -7,6 +8,7 @@ import cn.myflv.android.noactive.server.ProcessRecord;
 import cn.myflv.android.noactive.server.ReceiverList;
 import cn.myflv.android.noactive.utils.Log;
 import de.robv.android.xposed.XC_MethodHook;
+import de.robv.android.xposed.XposedHelpers;
 
 public class BroadcastDeliverHook extends XC_MethodHook {
     private final MemData memData;
@@ -15,6 +17,7 @@ public class BroadcastDeliverHook extends XC_MethodHook {
         this.memData = memData;
     }
 
+    @Override
     public void beforeHookedMethod(MethodHookParam param) throws Throwable {
         Object[] args = param.args;
         if (args[1] == null) {
@@ -54,8 +57,33 @@ public class BroadcastDeliverHook extends XC_MethodHook {
         if (memData.getWhiteApps().contains(packageName) || memData.getWhiteProcessList().contains(processName)) {
             return;
         }
+        // 暂存
+        Object app = XposedHelpers.getObjectField(receiverList, FieldEnum.app);
+        param.setObjectExtra(FieldEnum.app, app);
         Log.d(processRecord.getProcessName() + " clear broadcast");
         // 清楚广播
         receiverList.clear();
+    }
+
+    @Override
+    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+        super.afterHookedMethod(param);
+
+        // 获取进程
+        Object app = param.getObjectExtra(FieldEnum.app);
+        if (app == null) {
+            return;
+        }
+
+        Object[] args = param.args;
+        if (args[1] == null) {
+            return;
+        }
+        Object receiverList = XposedHelpers.getObjectField(args[1], FieldEnum.receiverList);
+        if (receiverList == null) {
+            return;
+        }
+        // 还原修改
+        XposedHelpers.setObjectField(receiverList, FieldEnum.app, app);
     }
 }

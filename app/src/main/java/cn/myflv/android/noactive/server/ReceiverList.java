@@ -1,6 +1,8 @@
 package cn.myflv.android.noactive.server;
 
 import cn.myflv.android.noactive.entity.FieldEnum;
+import cn.myflv.android.noactive.utils.Log;
+import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedHelpers;
 import lombok.Data;
 
@@ -17,7 +19,10 @@ public class ReceiverList {
         }
     }
 
+
     public void clear() {
         XposedHelpers.setObjectField(receiverList, FieldEnum.app, null);
     }
+
+
 }
