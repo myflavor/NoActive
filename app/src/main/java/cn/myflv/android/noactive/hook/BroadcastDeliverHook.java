@@ -58,7 +58,7 @@ public class BroadcastDeliverHook extends XC_MethodHook {
             return;
         }
         // 暂存
-        Object app = XposedHelpers.getObjectField(receiverList, FieldEnum.app);
+        Object app = processRecord.getProcessRecord();
         param.setObjectExtra(FieldEnum.app, app);
         Log.d(processRecord.getProcessName() + " clear broadcast");
         // 清楚广播
