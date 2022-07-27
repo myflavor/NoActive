@@ -77,6 +77,7 @@ public class AppSwitchHook extends XC_MethodHook {
             // 判断是否白名单系统APP
             if (isSystem && !memData.getBlackSystemApps().contains(packageName)) {
                 Log.d(packageName + " is white system app");
+                return;
             }
             if (event == ACTIVITY_PAUSED) {
                 //暂停事件
