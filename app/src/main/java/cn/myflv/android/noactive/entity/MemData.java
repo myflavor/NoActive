@@ -27,6 +27,9 @@ public class MemData {
     public int getBackgroundIndex(String packageName) {
         int total = appBackgroundSet.size();
         for (String pkg : appBackgroundSet) {
+            if (whiteApps.contains(pkg)) {
+                continue;
+            }
             if (packageName.equals(pkg)) {
                 return total;
             } else {

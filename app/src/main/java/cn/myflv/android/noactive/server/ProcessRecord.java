@@ -30,15 +30,6 @@ public class ProcessRecord {
         this.applicationInfo = new ApplicationInfo(XposedHelpers.getObjectField(processRecord, FieldEnum.info));
     }
 
-
-    public boolean isNull() {
-        return processRecord == null;
-    }
-
-    public int getCurAdj() {
-        return XposedHelpers.getIntField(processRecord, FieldEnum.curAdj);
-    }
-
     public void setCurAdj(int curAdj) {
         XposedHelpers.setIntField(processRecord, FieldEnum.curAdj, curAdj);
     }
