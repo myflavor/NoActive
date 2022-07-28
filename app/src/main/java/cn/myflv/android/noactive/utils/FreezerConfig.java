@@ -24,6 +24,7 @@ public class FreezerConfig {
     public final static String disableOOM = "disable.oom";
     public final static String kill19 = "kill.19";
     public final static String kill20 = "kill.20";
+    public final static String freezerV1 = "freezer.v1";
     public final static String freezerV2 = "freezer.v2";
     public final static String colorOs = "color.os";
 
@@ -46,6 +47,9 @@ public class FreezerConfig {
     public static int getFreezerVersion(ClassLoader classLoader) {
         if (isConfigOn(freezerV2)) {
             return 2;
+        }
+        if (isConfigOn(freezerV1)) {
+            return 1;
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             Class<?> CachedAppOptimizer = XposedHelpers.findClass(ClassEnum.CachedAppOptimizer, classLoader);

@@ -26,5 +26,7 @@ public class ClassEnum {
 
     public final static String MilletConfig = "com.miui.powerkeeper.millet.MilletConfig";
     public final static String CachedAppOptimizer = "com.android.server.am.CachedAppOptimizer";
-    public final static String ProcessList="com.android.server.am.ProcessList";
+    public final static String ProcessList = "com.android.server.am.ProcessList";
+    public final static String PowerStateMachine = "com.miui.powerkeeper.statemachine.PowerStateMachine";
+    public final static String SleepModeControllerNew = "com.miui.powerkeeper.statemachine.SleepModeControllerNew";
 }

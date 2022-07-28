@@ -28,10 +28,21 @@ public class Hook implements IXposedHookLoadPackage {
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam packageParam) throws Throwable {
         // 禁用 millet
         if (packageParam.packageName.equals("com.miui.powerkeeper")) {
+
+            try {
+                XposedHelpers.findAndHookMethod(ClassEnum.PowerStateMachine, packageParam.classLoader, MethodEnum.clearAppWhenScreenOffTimeOut, XC_MethodReplacement.DO_NOTHING);
+                XposedHelpers.findAndHookMethod(ClassEnum.PowerStateMachine, packageParam.classLoader, MethodEnum.clearAppWhenScreenOffTimeOutInNight, XC_MethodReplacement.DO_NOTHING);
+                XposedHelpers.findAndHookMethod(ClassEnum.SleepModeControllerNew, packageParam.classLoader, MethodEnum.clearApp, XC_MethodReplacement.DO_NOTHING);
+                XposedBridge.log("NoActive -> Disable MIUI clearApp");
+            } catch (Throwable throwable) {
+                XposedBridge.log("NoActive -> Disable MIUI clearApp failed");
+            }
+
             try {
                 XposedHelpers.findAndHookMethod(ClassEnum.MilletConfig, packageParam.classLoader, MethodEnum.getEnable, Context.class, new MilletHook());
                 XposedBridge.log("NoActive -> Disable millet");
-            } catch (Exception ignored) {
+            } catch (Throwable ignored) {
+                XposedBridge.log("NoActive -> Disable millet failed");
             }
             return;
         }
