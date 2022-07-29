@@ -39,5 +39,5 @@ public class MethodEnum {
     public final static String setOomAdj = "setOomAdj";
     public final static String clearAppWhenScreenOffTimeOutInNight = "clearAppWhenScreenOffTimeOutInNight";
     public final static String clearAppWhenScreenOffTimeOut = "clearAppWhenScreenOffTimeOut";
-    public final static String clearApp = "clearApp";
+    public final static String clearUnactiveApps = "clearUnactiveApps";
 }

@@ -32,7 +32,7 @@ public class Hook implements IXposedHookLoadPackage {
             try {
                 XposedHelpers.findAndHookMethod(ClassEnum.PowerStateMachine, packageParam.classLoader, MethodEnum.clearAppWhenScreenOffTimeOut, XC_MethodReplacement.DO_NOTHING);
                 XposedHelpers.findAndHookMethod(ClassEnum.PowerStateMachine, packageParam.classLoader, MethodEnum.clearAppWhenScreenOffTimeOutInNight, XC_MethodReplacement.DO_NOTHING);
-                XposedHelpers.findAndHookMethod(ClassEnum.SleepModeControllerNew, packageParam.classLoader, MethodEnum.clearApp, XC_MethodReplacement.DO_NOTHING);
+                XposedHelpers.findAndHookMethod(ClassEnum.PowerStateMachine, packageParam.classLoader, MethodEnum.clearUnactiveApps, XC_MethodReplacement.DO_NOTHING);
                 XposedBridge.log("NoActive -> Disable MIUI clearApp");
             } catch (Throwable throwable) {
                 XposedBridge.log("NoActive -> Disable MIUI clearApp failed");
