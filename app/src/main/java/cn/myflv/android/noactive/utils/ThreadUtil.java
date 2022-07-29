@@ -5,7 +5,7 @@ public class ThreadUtil {
         try {
             Thread.sleep(ms);
         } catch (InterruptedException ignored) {
-
+            Log.w("Thread sleep failed");
         }
     }
 
@@ -13,7 +13,7 @@ public class ThreadUtil {
         try {
             Thread.sleep(ms);
         } catch (InterruptedException ignored) {
-
+            Log.w("Thread sleep failed");
         }
     }
 }

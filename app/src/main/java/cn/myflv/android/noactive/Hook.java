@@ -13,7 +13,6 @@ import cn.myflv.android.noactive.hook.BroadcastDeliverHook;
 import cn.myflv.android.noactive.hook.CacheFreezerHook;
 import cn.myflv.android.noactive.hook.MilletHook;
 import cn.myflv.android.noactive.hook.OomAdjHook;
-import cn.myflv.android.noactive.hook.TestHook;
 import cn.myflv.android.noactive.utils.FreezerConfig;
 import cn.myflv.android.noactive.utils.Log;
 import de.robv.android.xposed.IXposedHookLoadPackage;
@@ -32,17 +31,17 @@ public class Hook implements IXposedHookLoadPackage {
             try {
                 XposedHelpers.findAndHookMethod(ClassEnum.PowerStateMachine, packageParam.classLoader, MethodEnum.clearAppWhenScreenOffTimeOut, XC_MethodReplacement.DO_NOTHING);
                 XposedHelpers.findAndHookMethod(ClassEnum.PowerStateMachine, packageParam.classLoader, MethodEnum.clearAppWhenScreenOffTimeOutInNight, XC_MethodReplacement.DO_NOTHING);
-                XposedHelpers.findAndHookMethod(ClassEnum.PowerStateMachine, packageParam.classLoader, MethodEnum.clearUnactiveApps, XC_MethodReplacement.DO_NOTHING);
-                XposedBridge.log("NoActive -> Disable MIUI clearApp");
+                XposedHelpers.findAndHookMethod(ClassEnum.PowerStateMachine, packageParam.classLoader, MethodEnum.clearUnactiveApps, Context.class, XC_MethodReplacement.DO_NOTHING);
+                XposedBridge.log("NoActive(info) -> Disable MIUI clearApp");
             } catch (Throwable throwable) {
-                XposedBridge.log("NoActive -> Disable MIUI clearApp failed");
+                XposedBridge.log("NoActive(error) -> Disable MIUI clearApp failed: " + throwable.getMessage());
             }
 
             try {
                 XposedHelpers.findAndHookMethod(ClassEnum.MilletConfig, packageParam.classLoader, MethodEnum.getEnable, Context.class, new MilletHook());
-                XposedBridge.log("NoActive -> Disable millet");
-            } catch (Throwable ignored) {
-                XposedBridge.log("NoActive -> Disable millet failed");
+                XposedBridge.log("NoActive(info) -> Disable millet");
+            } catch (Throwable throwable) {
+                XposedBridge.log("NoActive(error) -> Disable millet failed: " + throwable.getMessage());
             }
             return;
         }
@@ -81,8 +80,8 @@ public class Hook implements IXposedHookLoadPackage {
         if (!FreezerConfig.isConfigOn(FreezerConfig.disableOOM)) {
             boolean colorOs = FreezerConfig.isColorOs();
             if (!colorOs && (Build.MANUFACTURER.equals("OPPO") || Build.MANUFACTURER.equals("OnePlus"))) {
-                Log.i("If you are using ColorOS");
-                Log.i("You can create file color.os");
+                Log.w("If you are using ColorOS");
+                Log.w("You can create file color.os");
             }
             // Hook oom_adj
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {

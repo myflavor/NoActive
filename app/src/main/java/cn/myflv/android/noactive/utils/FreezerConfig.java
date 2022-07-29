@@ -1,7 +1,6 @@
 package cn.myflv.android.noactive.utils;
 
 import android.os.Build;
-import android.os.Environment;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -40,7 +39,7 @@ public class FreezerConfig {
         if (isConfigOn(kill20)) {
             return 20;
         }
-        return -1;
+        return 19;
     }
 
 
@@ -103,6 +102,7 @@ public class FreezerConfig {
         }
     }
 
+
     public static Set<String> get(String name) {
         Set<String> set = new HashSet<>();
         try {
@@ -117,9 +117,9 @@ public class FreezerConfig {
             }
             bufferedReader.close();
         } catch (FileNotFoundException fileNotFoundException) {
-            Log.i(name + " file not found");
+            Log.e(name + " file not found");
         } catch (IOException ioException) {
-            Log.i(name + " file read filed");
+            Log.e(name + " file read filed");
         }
         return set;
     }
@@ -131,7 +131,7 @@ public class FreezerConfig {
                 throw new IOException();
             }
         } catch (IOException e) {
-            Log.i(file.getName() + " file create filed");
+            Log.e(file.getName() + " file create filed");
         }
     }
 }

@@ -21,7 +21,6 @@ public class FreezeUtils {
     private static final int FREEZE_ACTION = 1;
     private static final int UNFREEZE_ACTION = 0;
 
-
     private static final String V1_FREEZER_FROZEN_PORCS = "/sys/fs/cgroup/freezer/perf/frozen/cgroup.procs";
     private static final String V1_FREEZER_THAWED_PORCS = "/sys/fs/cgroup/freezer/perf/thawed/cgroup.procs";
 
@@ -106,7 +105,8 @@ public class FreezeUtils {
             PrintWriter writer = new PrintWriter(path);
             writer.write(Integer.toString(val));
             writer.close();
-        } catch (IOException ignored) {
+        } catch (IOException e) {
+            Log.e("Freezer V1 failed: " + e.getMessage());
         }
     }
 
@@ -121,7 +121,8 @@ public class FreezeUtils {
                 writer.write(Integer.toString(UNFREEZE_ACTION));
             }
             writer.close();
-        } catch (IOException ignored) {
+        } catch (IOException e) {
+            Log.e("Freezer V2 failed: " + e.getMessage());
         }
     }
 
