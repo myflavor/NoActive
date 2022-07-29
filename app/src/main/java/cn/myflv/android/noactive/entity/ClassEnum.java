@@ -29,4 +29,5 @@ public class ClassEnum {
     public final static String ProcessList = "com.android.server.am.ProcessList";
     public final static String PowerStateMachine = "com.miui.powerkeeper.statemachine.PowerStateMachine";
     public final static String SleepModeControllerNew = "com.miui.powerkeeper.statemachine.SleepModeControllerNew";
+    public final static String Process = "android.os.Process";
 }

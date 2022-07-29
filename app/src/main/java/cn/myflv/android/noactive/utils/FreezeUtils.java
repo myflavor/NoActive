@@ -12,7 +12,10 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.myflv.android.noactive.entity.ClassEnum;
+import cn.myflv.android.noactive.entity.MethodEnum;
 import cn.myflv.android.noactive.server.ProcessRecord;
+import de.robv.android.xposed.XposedHelpers;
 
 public class FreezeUtils {
 
@@ -24,19 +27,36 @@ public class FreezeUtils {
     private static final String V1_FREEZER_FROZEN_PORCS = "/sys/fs/cgroup/freezer/perf/frozen/cgroup.procs";
     private static final String V1_FREEZER_THAWED_PORCS = "/sys/fs/cgroup/freezer/perf/thawed/cgroup.procs";
 
+    private final boolean freezerApi;
     private final int freezerVersion;
     private final int stopSignal;
     private final boolean useKill;
+    private final ClassLoader classLoader;
 
 
     public FreezeUtils(ClassLoader classLoader) {
-        this.freezerVersion = FreezerConfig.getFreezerVersion(classLoader);
+        this.classLoader = classLoader;
+        String freezerVersion = FreezerConfig.getFreezerVersion(classLoader);
+        switch (freezerVersion) {
+            case FreezerConfig.API:
+                this.freezerApi = true;
+                this.freezerVersion = 2;
+                break;
+            case FreezerConfig.V2:
+                this.freezerApi = false;
+                this.freezerVersion = 2;
+                break;
+            case FreezerConfig.V1:
+            default:
+                this.freezerApi = false;
+                this.freezerVersion = 1;
+        }
         this.stopSignal = FreezerConfig.getKillSignal();
         this.useKill = FreezerConfig.isUseKill();
         if (useKill) {
             Log.i("Kill -" + stopSignal);
         } else {
-            Log.i("Freezer V" + freezerVersion);
+            Log.i("Freezer " + freezerVersion);
         }
     }
 
@@ -66,7 +86,11 @@ public class FreezeUtils {
             Process.sendSignal(processRecord.getPid(), stopSignal);
         } else {
             if (freezerVersion == 2) {
-                freezePid(processRecord.getPid(), processRecord.getUid());
+                if (freezerApi) {
+                    setProcessFrozen(processRecord.getPid(), processRecord.getUid(), true);
+                } else {
+                    freezePid(processRecord.getPid(), processRecord.getUid());
+                }
             } else {
                 freezePid(processRecord.getPid());
             }
@@ -78,7 +102,11 @@ public class FreezeUtils {
             Process.sendSignal(processRecord.getPid(), CONT);
         } else {
             if (freezerVersion == 2) {
-                thawPid(processRecord.getPid(), processRecord.getUid());
+                if (freezerApi) {
+                    setProcessFrozen(processRecord.getPid(), processRecord.getUid(), false);
+                } else {
+                    thawPid(processRecord.getPid(), processRecord.getUid());
+                }
             } else {
                 thawPid(processRecord.getPid());
             }
@@ -137,5 +165,10 @@ public class FreezeUtils {
 
     public static void kill(int pid) {
         Process.killProcess(pid);
+    }
+
+    public void setProcessFrozen(int pid, int uid, boolean frozen) {
+        Class<?> Process = XposedHelpers.findClass(ClassEnum.Process, classLoader);
+        XposedHelpers.callStaticMethod(Process, MethodEnum.setProcessFrozen, pid, uid, frozen);
     }
 }

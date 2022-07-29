@@ -25,7 +25,12 @@ public class FreezerConfig {
     public final static String kill20 = "kill.20";
     public final static String freezerV1 = "freezer.v1";
     public final static String freezerV2 = "freezer.v2";
+    public final static String freezerApi = "freezer.api";
     public final static String colorOs = "color.os";
+    public final static String API = "Api";
+    public final static String V2 = "V2";
+    public final static String V1 = "V1";
+
 
     public static boolean isConfigOn(String configName) {
         File config = new File(ConfigDir, configName);
@@ -43,21 +48,24 @@ public class FreezerConfig {
     }
 
 
-    public static int getFreezerVersion(ClassLoader classLoader) {
+    public static String getFreezerVersion(ClassLoader classLoader) {
         if (isConfigOn(freezerV2)) {
-            return 2;
+            return V2;
         }
         if (isConfigOn(freezerV1)) {
-            return 1;
+            return V1;
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (isConfigOn(freezerApi)) {
+                return API;
+            }
             Class<?> CachedAppOptimizer = XposedHelpers.findClass(ClassEnum.CachedAppOptimizer, classLoader);
             boolean isSupportV2 = (boolean) XposedHelpers.callStaticMethod(CachedAppOptimizer, MethodEnum.isFreezerSupported);
             if (isSupportV2) {
-                return 2;
+                return V2;
             }
         }
-        return 1;
+        return V1;
     }
 
 
