@@ -2,18 +2,13 @@ package cn.myflv.android.noactive.utils;
 
 import android.os.FileObserver;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import cn.myflv.android.noactive.entity.MemData;
 
 public class ConfigFileObserver extends FileObserver {
     private final MemData memData;
-    private final String[] files = {FreezerConfig.whiteAppConfig, FreezerConfig.whiteProcessConfig,
-            FreezerConfig.killProcessConfig, FreezerConfig.blackSystemAppConfig};
 
     public ConfigFileObserver(MemData memData) {
         super(FreezerConfig.ConfigDir);
@@ -25,7 +20,7 @@ public class ConfigFileObserver extends FileObserver {
     @Override
     public void startWatching() {
         super.startWatching();
-        for (String file : files) {
+        for (String file : FreezerConfig.listenConfig) {
             Log.d("Start monitor " + file);
         }
     }
@@ -46,7 +41,7 @@ public class ConfigFileObserver extends FileObserver {
     }
 
     public void reload() {
-        for (String file : files) {
+        for (String file : FreezerConfig.listenConfig) {
             Log.d("Reload " + file);
             Set<String> newConfig = new HashSet<>(FreezerConfig.get(file));
             switch (file) {

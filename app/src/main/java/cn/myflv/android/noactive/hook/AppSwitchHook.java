@@ -1,6 +1,7 @@
 package cn.myflv.android.noactive.hook;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +28,7 @@ public class AppSwitchHook extends XC_MethodHook {
 
     private final MemData memData;
     private final FreezeUtils freezeUtils;
-    private final Map<String, Long> freezerTokenMap = new HashMap<>();
+    private final Map<String, Long> freezerTokenMap = Collections.synchronizedMap(new HashMap<>());
 
     public AppSwitchHook(ClassLoader classLoader, MemData memData, int type) {
         this.ACTIVITY_RESUMED = Event.ACTIVITY_RESUMED(classLoader);

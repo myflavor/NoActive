@@ -15,6 +15,8 @@ import cn.myflv.android.noactive.entity.MethodEnum;
 import de.robv.android.xposed.XposedHelpers;
 
 public class FreezerConfig {
+
+
     public final static String ConfigDir = "/data/system/NoActive";
     public final static String whiteAppConfig = "whiteApp.conf";
     public final static String blackSystemAppConfig = "blackSystemApp.conf";
@@ -30,6 +32,10 @@ public class FreezerConfig {
     public final static String API = "Api";
     public final static String V2 = "V2";
     public final static String V1 = "V1";
+
+
+    public final static String[] listenConfig = {whiteAppConfig, whiteProcessConfig,
+            killProcessConfig, blackSystemAppConfig};
 
 
     public static boolean isConfigOn(String configName) {
@@ -80,33 +86,17 @@ public class FreezerConfig {
 
     public static void checkAndInit() {
         File configDir = new File(ConfigDir);
-        File whiteApp = new File(ConfigDir, whiteAppConfig);
-        File whiteProcess = new File(ConfigDir, whiteProcessConfig);
-        File killProcess = new File(ConfigDir, killProcessConfig);
-        File blackSystemApp = new File(ConfigDir, blackSystemAppConfig);
         if (!configDir.exists()) {
             boolean mkdir = configDir.mkdir();
             if (!mkdir) return;
             Log.i("Init config dir");
         }
-
-        if (!whiteApp.exists()) {
-            createFile(whiteApp);
-            Log.i("Init white app conf");
-        }
-
-        if (!whiteProcess.exists()) {
-            createFile(whiteProcess);
-            Log.i("Init white process conf");
-        }
-        if (!killProcess.exists()) {
-            createFile(killProcess);
-            Log.i("Init kill process conf");
-        }
-
-        if (!blackSystemApp.exists()) {
-            createFile(blackSystemApp);
-            Log.i("Init black system app conf");
+        for (String configName : listenConfig) {
+            File config = new File(configDir, configName);
+            if (!config.exists()) {
+                createFile(config);
+                Log.i("Init " + configName);
+            }
         }
     }
 
