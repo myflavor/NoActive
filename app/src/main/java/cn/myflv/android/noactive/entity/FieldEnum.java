@@ -19,10 +19,7 @@ public class FieldEnum {
     public final static String app = "app";
     public final static String mAnrRecords = "mAnrRecords";
     public final static String mContext = "mContext";
-    public final static String mErrorState = "mErrorState";
-    public final static String mState = "mState";
     public final static String userId = "userId";
-    public final static String mProcLock = "mProcLock";
     public final static String mApp = "mApp";
     public final static String curAdj = "curAdj";
 }
