@@ -2,6 +2,7 @@ package cn.myflv.android.noactive.hook;
 
 import cn.myflv.android.noactive.entity.FieldEnum;
 import cn.myflv.android.noactive.entity.MemData;
+import cn.myflv.android.noactive.server.ActivityManagerService;
 import cn.myflv.android.noactive.server.ApplicationInfo;
 import cn.myflv.android.noactive.server.BroadcastFilter;
 import cn.myflv.android.noactive.server.ProcessRecord;
@@ -32,6 +33,9 @@ public class BroadcastDeliverHook extends XC_MethodHook {
         ProcessRecord processRecord = receiverList.getProcessRecord();
         // 如果进程或者应用信息为空就不处理
         if (processRecord == null || processRecord.getApplicationInfo() == null) {
+            return;
+        }
+        if (processRecord.getUserId() != ActivityManagerService.MAIN_USER) {
             return;
         }
         ApplicationInfo applicationInfo = processRecord.getApplicationInfo();

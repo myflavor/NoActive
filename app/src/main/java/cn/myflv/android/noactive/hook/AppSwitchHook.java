@@ -1,7 +1,5 @@
 package cn.myflv.android.noactive.hook;
 
-import android.os.Process;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -54,7 +52,10 @@ public class AppSwitchHook extends XC_MethodHook {
             int event = (int) args[2];
             // AMS有两个方法，但参数不同
             String packageName = type == SIMPLE ? (String) args[0] : new ComponentName(args[0]).getPackageName();
-
+            int userId = (int) args[1];
+            if (userId != ActivityManagerService.MAIN_USER) {
+                return;
+            }
             // 如果是进入前台
             if (event == ACTIVITY_RESUMED) {
                 // 后台APP移除
@@ -107,6 +108,9 @@ public class AppSwitchHook extends XC_MethodHook {
         synchronized (processList.getProcessList()) {
             // 遍历进程列表
             for (ProcessRecord processRecord : processRecords) {
+                if (processRecord.getUserId() != ActivityManagerService.MAIN_USER) {
+                    continue;
+                }
                 ApplicationInfo applicationInfo = processRecord.getApplicationInfo();
                 // 如果包名和事件的包名不同就不处理
                 if (!applicationInfo.getPackageName().equals(packageName)) {

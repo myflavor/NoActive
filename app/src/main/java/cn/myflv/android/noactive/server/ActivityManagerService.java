@@ -2,9 +2,7 @@ package cn.myflv.android.noactive.server;
 
 
 import android.content.Context;
-import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 
 import java.lang.reflect.InvocationTargetException;
@@ -18,6 +16,7 @@ import lombok.Data;
 
 @Data
 public class ActivityManagerService {
+    public final static int MAIN_USER = 0;
     private final Object activityManagerService;
     private final ProcessList processList;
     private final ActiveServices activeServices;

@@ -1,6 +1,7 @@
 package cn.myflv.android.noactive.hook;
 
 import cn.myflv.android.noactive.entity.MemData;
+import cn.myflv.android.noactive.server.ActivityManagerService;
 import cn.myflv.android.noactive.server.AnrHelper;
 import cn.myflv.android.noactive.server.ProcessRecord;
 import cn.myflv.android.noactive.utils.Log;
@@ -28,8 +29,10 @@ public class ANRHook extends XC_MethodReplacement {
         boolean isSystem = processRecord.getApplicationInfo().isSystem();
         // 进程对应包名
         String packageName = processRecord.getApplicationInfo().getPackageName();
+        boolean isNotBlackSystem = !memData.getBlackSystemApps().contains(packageName);
+
         // 系统应用并且不是系统黑名单
-        if (isSystem && !memData.getBlackSystemApps().contains(packageName)) {
+        if ((isSystem && isNotBlackSystem) || processRecord.getUserId() != ActivityManagerService.MAIN_USER) {
             synchronized (anrHelper.getAnrRecords()) {
                 // 添加ANR记录
                 anrHelper.add(args);
