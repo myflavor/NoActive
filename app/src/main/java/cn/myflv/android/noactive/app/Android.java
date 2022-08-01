@@ -1,12 +1,14 @@
 package cn.myflv.android.noactive.app;
 
 import android.content.Intent;
+import android.os.Binder;
 import android.os.Build;
 
 import cn.myflv.android.noactive.entity.ClassEnum;
 import cn.myflv.android.noactive.entity.MemData;
 import cn.myflv.android.noactive.entity.MethodEnum;
 import cn.myflv.android.noactive.hook.ANRHook;
+import cn.myflv.android.noactive.hook.ActiveCheckHook;
 import cn.myflv.android.noactive.hook.AppSwitchHook;
 import cn.myflv.android.noactive.hook.BroadcastDeliverHook;
 import cn.myflv.android.noactive.hook.CacheFreezerHook;
@@ -98,6 +100,9 @@ public class Android implements IAppHook {
             Log.i("Android N-P");
             Log.i("Force keep process");
         }
+
+        // Hook Binder transact
+        XposedHelpers.findAndHookMethod(Binder.class, "execTransact", int.class, long.class, long.class, int.class, new ActiveCheckHook());
 
         Log.i("Load success");
     }
